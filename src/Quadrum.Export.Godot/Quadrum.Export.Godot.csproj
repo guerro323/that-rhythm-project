@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>exe</OutputType>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
+        <LangVersion>preview</LangVersion>
+
+        <!-- Nuget warn about packages downgrade, but they're actually intended (since they're local) -->
+        <NoWarn>$(NoWarn);NU1605</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GodotCLR" Version="0.0.0-local" />
+        <PackageReference Include="revghost" Version="0.0.0-local" />
+        <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Quadrum.Game\Quadrum.Game.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Core" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Quadrum.Export.Godot.runtimeconfig.json" />
+      <Content Include="Quadrum.Export.Godot.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <Target Name="CopyModule" AfterTargets="Build">
+        <ItemGroup>
+            <ModuleAsm Include="$(OutDir)*" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(ModuleAsm)" DestinationFolder="../../Godot/project/dotnet" SkipUnchangedFiles="true" />
+    </Target>
+
+</Project>
