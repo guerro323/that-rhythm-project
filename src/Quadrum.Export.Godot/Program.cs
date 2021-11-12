@@ -9,24 +9,10 @@ using revghost.Module.Storage;
 
 namespace Quadrum.Export.Godot;
 
-[RequiresPreviewFeatures]
-interface Iok
-{
-    static abstract void Yes();
-}
-
-public class Program : Iok
-{
-    static T Add<T>(T value)
-        where T : IAdditionOperators<T, T, T>
-    {
-        return value + value;
-    }
-    
+public class Program
+{    
     public static unsafe int Load(IntPtr ptr, int args)
     {
-        Add(4);
-        
         Console.WriteLine("Program - Load");
         
         GodotHL.Load(ptr, OnUpdate, OnClean, OnExchange);
