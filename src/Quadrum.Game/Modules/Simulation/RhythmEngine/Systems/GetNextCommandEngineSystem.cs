@@ -56,7 +56,7 @@ public partial struct GetNextCommandEngineSystem : ISystem
 
             RhythmCommandUtility.GetCommand(
                 cmd,
-                commands, buffer.Reinterpret<FlowPressure>(), output,
+                commands.AsSpan(0, count), buffer.Reinterpret<FlowPressure>(), output,
                 false, settings.BeatInterval);
 
             predictedBuffer.Clear();
@@ -65,7 +65,7 @@ public partial struct GetNextCommandEngineSystem : ISystem
             {
                 RhythmCommandUtility.GetCommand(
                     cmd,
-                    commands, buffer.Reinterpret<FlowPressure>(), output,
+                    commands.AsSpan(0, count), buffer.Reinterpret<FlowPressure>(), output,
                     true, settings.BeatInterval
                 );
                 if (output.Count > 0)

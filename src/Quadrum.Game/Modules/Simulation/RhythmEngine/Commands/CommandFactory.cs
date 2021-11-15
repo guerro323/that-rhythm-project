@@ -12,6 +12,7 @@ public static class CommandFactory
     {
         var output = cmd.CreateEntity();
         cmd.AddCommandActions(output);
+        cmd.AddCommandDuration(output, new CommandDuration(4));
 
         return (output, cmd.UpdateCommandActions(output).Reinterpret<RhythmCommandAction>());
     }

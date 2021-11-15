@@ -15,7 +15,12 @@ public partial struct RhythmEngineLayout : IEntityLayoutComponent
             RhythmEngineRecoveryState.Type.GetOrCreate(world),
 
             GameComboState.Type.GetOrCreate(world),
-            GameComboSettings.Type.GetOrCreate(world)
+            GameComboSettings.Type.GetOrCreate(world),
+            
+            GameCommandState.Type.GetOrCreate(world),
+            RhythmEngineExecutingCommand.Type.GetOrCreate(world),
+            RhythmEngineCommandProgress.Type.GetOrCreate(world),
+            RhythmEnginePredictedCommands.Type.GetOrCreate(world)
         });
     }
 }
