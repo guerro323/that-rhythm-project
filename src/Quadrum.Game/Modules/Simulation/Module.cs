@@ -35,9 +35,7 @@ public partial class Module : HostModule
             
             _world.Set(new CurrentSimulationClient(domain));
         }
-
-        LoadModule(scope => new RhythmEngine.Module(scope));
-
+        
         TrackDomain((SimulationDomain domain) =>
         {
             Disposables.AddRange(new IDisposable[]

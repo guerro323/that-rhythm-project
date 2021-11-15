@@ -1,18 +1,16 @@
-using System.Runtime.InteropServices;
-using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using revecs;
-using revecs.Core;
 using revecs.Systems;
 
-namespace Quadrum.Game.Modules.Simulation.RhythmEngine;
+namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
 public partial struct ProcessSystem : ISystem
 {
     // Without prediction system for now
 
     [RevolutionSystem]
+    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
     [DependOn(typeof(ApplyTagsSystem))]
     private static void Method(
         [Singleton] GameTimeSingleton time,

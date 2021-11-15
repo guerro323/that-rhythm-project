@@ -23,5 +23,5 @@ public partial struct GameComboSettings : ISparseComponent
 public partial struct GameComboState : ISparseComponent
 {
     public int Count;
-    public int Score;
+    public float Score;
 }

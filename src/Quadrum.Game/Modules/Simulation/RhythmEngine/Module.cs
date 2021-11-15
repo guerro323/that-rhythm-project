@@ -15,9 +15,11 @@ public partial class Module : HostModule
     {
         TrackDomain((SimulationDomain domain) =>
         {
-            domain.SystemGroup.Add(new ApplyTagsSystem());
-            domain.SystemGroup.Add(new ResetStateOnStoppedSystem());
-            domain.SystemGroup.Add(new ProcessSystem());
+            domain.SystemGroup.Add(new Systems.ApplyTagsSystem());
+            domain.SystemGroup.Add(new Systems.ResetStateOnStoppedSystem());
+            domain.SystemGroup.Add(new Systems.ProcessSystem());
+            domain.SystemGroup.Add(new Systems.ResizeCommandBufferSystem());
+            domain.SystemGroup.Add(new Systems.GetNextCommandEngineSystem());
 
             var entity = domain.GameWorld.CreateEntity();
             domain.GameWorld.AddComponent(entity, RhythmEngineLayout.Type.GetOrCreate(domain.GameWorld));

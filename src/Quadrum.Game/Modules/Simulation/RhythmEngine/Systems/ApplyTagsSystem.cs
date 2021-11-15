@@ -1,13 +1,13 @@
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using revecs;
-using revecs.Core;
 using revecs.Systems;
 
-namespace Quadrum.Game.Modules.Simulation.RhythmEngine;
+namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
 public partial struct ApplyTagsSystem : ISystem
 {
     [RevolutionSystem]
+    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
     private static void Method(
         [Query] eq<
             Read<RhythmEngineController>

@@ -4,6 +4,8 @@ namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 
 public partial struct RhythmEngineState : ISparseComponent
 {
+    public FlowPressure LastPressure;
+    
     public TimeSpan Elapsed;
     public TimeSpan PreviousStartTime;
 
