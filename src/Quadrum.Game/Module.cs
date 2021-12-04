@@ -13,5 +13,7 @@ public class Module : HostModule
     {
         LoadModule(scope => new Modules.Simulation.Module(scope));
         LoadModule(scope => new Modules.Simulation.RhythmEngine.Module(scope));
+        LoadModule(scope => new Modules.Client.Audio.Module(scope));
+        LoadModule(scope => new Modules.Client.Audio.Implementation.SoLoud.Module(scope));
     }
-}
+} 

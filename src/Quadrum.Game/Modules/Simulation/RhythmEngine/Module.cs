@@ -25,7 +25,7 @@ public partial class Module : HostModule
             domain.SystemGroup.Add(new Systems.RhythmEngineExecutionGroup.End());
 
             var entity = domain.GameWorld.CreateEntity();
-            domain.GameWorld.AddComponent(entity, RhythmEngineLayout.Type.GetOrCreate(domain.GameWorld));
+            domain.GameWorld.AddComponent(entity, RhythmEngineLayout.Type.GetOrCreate(domain.GameWorld), default);
 
             ref var controller = ref domain.GameWorld.GetComponentData(
                 entity,

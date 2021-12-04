@@ -2,8 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
 
     <!-- Nuget warn about packages downgrade, but they're actually intended (since they're local) -->
     <NoWarn>$(NoWarn);NU1605</NoWarn>
@@ -14,9 +15,15 @@
     <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" />
     <PackageReference Include="revghost" Version="0.0.0-local" />
     <PackageReference Include="revghost.Shared" Version="0.0.0-local" />
+    <PackageReference Include="System.Runtime.Experimental" Version="6.0.0-preview.7.21377.19" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Modules\Simulation\Units" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="native\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
