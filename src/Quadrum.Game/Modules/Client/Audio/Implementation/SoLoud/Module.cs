@@ -1,3 +1,4 @@
+using System.Threading;
 using GameHost.Audio;
 using Quadrum.Game.Modules.Client.Audio.Server;
 using Quadrum.Game.Modules.Simulation.Application;
@@ -19,16 +20,16 @@ public class Module : HostModule
     {
         soloud = new Soloud();
         soloud.init();
-        soloud.setGlobalVolume(0.5f);
-
+        soloud.setGlobalVolume(1f);
+        
         TrackDomain((SimulationDomain domain) =>
         {
             var sysScope = new FreeScope
             (
                 new MultipleScopeContext
                 {
-                    domain.Scope.Context,
-                    ModuleScope.Context
+                    ModuleScope.Context,
+                    domain.Scope.Context
                 }
             );
 

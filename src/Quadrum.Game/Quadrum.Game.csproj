@@ -20,10 +20,19 @@
   <ItemGroup>
     <Folder Include="Modules\Simulation\Units" />
   </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Update="native\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackageFlatten>true</PackageFlatten>
+      <PackagePath>contentFiles\any\asset;content\any\asset</PackagePath>
     </None>
+  </ItemGroup>-->
+  <ItemGroup Label="NativeFiles">
+    <Content Include="native/*">
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

@@ -16,7 +16,7 @@ public class SoloudServerSystem : AppSystem
 {
     public readonly Soloud SoloudObj;
 
-    private HostLogger _hostLogger;
+    private readonly HostLogger _logger = new HostLogger(nameof(SoloudServerSystem));
     
     private World _world;
     private IDomainUpdateLoopSubscriber _updateLoop;
@@ -25,8 +25,7 @@ public class SoloudServerSystem : AppSystem
     public SoloudServerSystem(Soloud soloudObj, Scope scope) : base(scope)
     {
         SoloudObj = soloudObj;
-
-        Dependencies.AddRef(() => ref _hostLogger);
+        
         Dependencies.AddRef(() => ref _world);
         Dependencies.AddRef(() => ref _updateLoop);
         Dependencies.AddRef(() => ref _worldTime);
@@ -71,17 +70,17 @@ public class SoloudServerSystem : AppSystem
 
     private unsafe void UpdateEntity(in WorldTime worldTime, in Entity entity)
     {
-        _hostLogger.Info("Playing for " + entity);
-        
         if (!entity.Has<Wav>())
         {
             if (!entity.TryGet(out AudioResource res))
             {
-                _hostLogger.Error($"No AudioResource found on {entity}");
+                _logger.Error($"No AudioResource found on {entity}");
                 return;
             }
 
             var wav = new Wav();
+
+            Console.WriteLine(res.Bytes.Length);
             fixed (byte* dataPtr = res.Bytes)
             {
                 wav.loadMem((IntPtr) dataPtr, (uint) res.Bytes.Length, 1);
@@ -93,9 +92,11 @@ public class SoloudServerSystem : AppSystem
         if (entity.Has<PlayAudioRequest>())
             if (!entity.TryGet(out AudioDelayComponent delay) || worldTime.Total >= delay.Delay)
             {
+                _logger.Info("Playing for " + entity, "Event");
+                
                 if (entity.TryGet(out uint currSoloudId))
                     SoloudObj.stop(currSoloudId);
-
+                
                 entity.Set(SoloudObj.play(entity.Get<Wav>()));
 
                 entity.Remove<PlayAudioRequest>();

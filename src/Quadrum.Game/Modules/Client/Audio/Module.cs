@@ -1,5 +1,8 @@
+using Quadrum.Game.Modules.Client.Audio.Client;
 using Quadrum.Game.Modules.Client.Audio.Server;
+using Quadrum.Game.Modules.Simulation.Application;
 using revghost;
+using revghost.Domains;
 using revghost.Module;
 using revghost.Threading.Components;
 using revghost.Threading.V2;
@@ -26,5 +29,11 @@ public class Module : HostModule
 
         //
         _hostScope.Context.Register(serverDomain);
+        
+        TrackDomain((SimulationDomain domain) =>
+        {
+            _ = new LoadIncomingAudioSystem(domain.Scope);
+            _ = new AudioClient(domain.Scope);
+        });
     }
 }

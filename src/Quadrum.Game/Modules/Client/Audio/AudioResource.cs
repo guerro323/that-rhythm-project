@@ -34,11 +34,13 @@ public class AudioResource
 
     public AudioResource(string key, Task<byte[]> task)
     {
+        Key = key;
         _task = task;
     }
 
     public AudioResource(string key, byte[] bytes)
     {
+        Key = key;
         _bytes = bytes;
     }
 }

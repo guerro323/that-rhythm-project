@@ -1,0 +1,14 @@
+<Project>
+    <ItemGroup>
+        <!--<Content Include="$(MSBuildThisFileDirectory)../native/*.dll">
+            <Link>%(FileName)%(Extension)</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>-->
+
+        <NativeLibs Include="$(MSBuildThisFileDirectory)**\*.dll" />
+        <None Include="@(NativeLibs)">
+            <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+</Project>

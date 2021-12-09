@@ -31,6 +31,11 @@ public struct AudioPlayerEntity : IDisposable
         
     }
 
+    public void SetAudio(Entity audioEntity)
+    {
+        Original.Set(audioEntity.Get<AudioResource>());
+    }
+
     public void SetAudio(IFile file)
     {
         Original.Set(ManagedResource<AudioResource>.Create(file));

@@ -4,8 +4,10 @@ using GodotCLR;
 using GodotCLR.HighLevel;
 using revghost;
 using revghost.Domains;
+using revghost.Injection;
 using revghost.IO.Storage;
 using revghost.Module.Storage;
+using revghost.Shared.Collections;
 
 namespace Quadrum.Export.Godot;
 

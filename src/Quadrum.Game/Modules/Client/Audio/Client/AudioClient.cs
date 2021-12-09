@@ -14,6 +14,8 @@ public class AudioClient : AppSystem
 
     public AudioClient(Scope scope) : base(scope)
     {
+        scope.Context.Register(this);
+        
         Dependencies.AddRef(() => ref _world);
     }
 
