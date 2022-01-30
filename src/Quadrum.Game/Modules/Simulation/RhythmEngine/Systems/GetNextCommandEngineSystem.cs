@@ -21,16 +21,16 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
     
     public void Body()
     {
-        using var commands = new ValueList<UEntityHandle>();
+        using var commands = new ValueList<UEntityHandle>(0);
         foreach (var iter in RequiredQuery(All<CommandActions>()))
         {
             commands.Add(iter.Handle);
         }
-
+        
         if (commands.Count == 0)
             return;
 
-        using var output = new ValueList<UEntitySafe>();
+        using var output = new ValueList<UEntitySafe>(0);
         foreach (var engine in RequiredQuery(
                      Read<RhythmEngineSettings>("Settings"),
                      Read<RhythmEngineState>("State"),
@@ -44,7 +44,7 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
 
             RhythmCommandUtility.GetCommand(
                 Cmd,
-                commands.Span, engine.Progress.Reinterpret<FlowPressure>(), output,
+                commands.Span, engine.Progress.Reinterpret<FlowPressure>(), in output,
                 false, engine.Settings.BeatInterval);
 
             engine.Predicted.Clear();
@@ -53,7 +53,7 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
             {
                 RhythmCommandUtility.GetCommand(
                     Cmd,
-                    commands.Span, engine.Progress.Reinterpret<FlowPressure>(), output,
+                    commands.Span, engine.Progress.Reinterpret<FlowPressure>(), in output,
                     true, engine.Settings.BeatInterval);
                 if (output.Count > 0)
                 {

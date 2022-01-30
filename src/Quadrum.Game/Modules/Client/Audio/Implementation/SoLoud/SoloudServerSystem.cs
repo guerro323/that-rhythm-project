@@ -60,7 +60,7 @@ public class SoloudServerSystem : AppSystem
 
     private void OnUpdate(WorldTime worldTime)
     {
-        using var list = new ValueList<Entity>();
+        using var list = new ValueList<Entity>(0);
         foreach (ref readonly var entity in _controllerSet.GetEntities())
             list.Add(entity);
 

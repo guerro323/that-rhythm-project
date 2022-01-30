@@ -120,7 +120,7 @@ public static class RhythmCommandUtility
     }
 
     public static void GetCommand<TCmd, TCommandList, TOutputEntityList>(TCmd cmd, Span<UEntityHandle> entities,
-        TCommandList executingCommand, TOutputEntityList commandsOutput,
+        TCommandList executingCommand, in TOutputEntityList commandsOutput,
         bool isPredicted, TimeSpan beatInterval)
         where TCmd : CommandActions.Cmd.IRead, ICmdEntitySafe
         where TCommandList : IList<FlowPressure>
