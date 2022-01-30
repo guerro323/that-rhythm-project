@@ -32,15 +32,15 @@ public partial class EntryModule : HostModule
 
         TrackDomain((SimulationDomain domain) =>
         {
-            domain.SystemGroup.Add(CreateUnit);
-            domain.SystemGroup.Add(MoveUnit);
+            /*domain.SystemGroup.Add(CreateUnit);
+            domain.SystemGroup.Add(MoveUnit);*/
 
             new UpdatePresentationSystems(domain.Scope);
             new TestPresentation(domain.Scope);
         });
     }
 
-    [RevolutionSystem]
+    /*[RevolutionSystem]
     private static void CreateUnit(
         [Query, Optional] limit<With<PositionComponent>> query,
         [Cmd] c<
@@ -123,5 +123,5 @@ public partial class EntryModule : HostModule
     public partial struct BounceCount : ISparseComponent
     {
         public int Value;
-    }
+    }*/
 }

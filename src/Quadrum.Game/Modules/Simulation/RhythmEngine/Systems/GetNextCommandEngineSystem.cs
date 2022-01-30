@@ -1,76 +1,63 @@
-using System.Collections;
-using System.Runtime.InteropServices;
-using Collections.Pooled;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Commands.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
-using revecs;
 using revecs.Core;
 using revecs.Extensions.Generator.Commands;
-using revecs.Systems;
-using revghost.Shared;
+using revecs.Systems.Generator;
+using revghost.Shared.Collections;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct GetNextCommandEngineSystem : ISystem
+public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
+    CommandActions.Cmd.IRead, 
+    CommandDuration.Cmd.IRead, 
+    ICmdEntitySafe
 {
-    private partial struct GetCommandQuery : IQuery<Read<CommandActions>>
-    {}
-
-    private partial struct EngineQuery : IQuery<
-            Read<RhythmEngineSettings>,
-            Read<RhythmEngineState>,
-            Write<RhythmEngineExecutingCommand>,
-            Read<RhythmEngineCommandProgress>,
-            Write<RhythmEnginePredictedCommands>
-        >,
-        With<RhythmEngineIsPlaying>
+    public void Constraints(in SystemObject sys)
     {
+        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
+        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
     }
-
-    private partial struct Commands : CommandActions.Cmd.IRead, CommandDuration.Cmd.IRead, ICmdEntitySafe
+    
+    public void Body()
     {
-    }
-
-    [RevolutionSystem]
-    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
-    private static void Method([Query] GetCommandQuery getCommand, [Query] EngineQuery engines, [Cmd] Commands cmd)
-    {
-        using var _0 = DisposableArray<UEntityHandle>.Rent(getCommand.GetEntityCount(), out var commands);
-
-        var count = 0;
-        foreach (var entity in getCommand.Query)
+        using var commands = new ValueList<UEntityHandle>();
+        foreach (var iter in RequiredQuery(All<CommandActions>()))
         {
-            commands[count++] = entity;
+            commands.Add(iter.Handle);
         }
 
-        if (count == 0)
+        if (commands.Count == 0)
             return;
 
-        using var output = new PooledList<UEntitySafe>();
-
-        foreach (var (settings, state, executing, buffer, predictedBuffer) in engines)
+        using var output = new ValueList<UEntitySafe>();
+        foreach (var engine in RequiredQuery(
+                     Read<RhythmEngineSettings>("Settings"),
+                     Read<RhythmEngineState>("State"),
+                     Write<RhythmEngineExecutingCommand>("Executing"),
+                     Read<RhythmEngineCommandProgress>("Progress"),
+                     Write<RhythmEnginePredictedCommands>("Predicted"),
+                     All<RhythmEngineIsPlaying>()))
         {
-            if (!state.CanRunCommands)
+            if (!engine.State.CanRunCommands)
                 continue;
 
             RhythmCommandUtility.GetCommand(
-                cmd,
-                commands.AsSpan(0, count), buffer.Reinterpret<FlowPressure>(), output,
-                false, settings.BeatInterval);
+                Cmd,
+                commands.Span, engine.Progress.Reinterpret<FlowPressure>(), output,
+                false, engine.Settings.BeatInterval);
 
-            predictedBuffer.Clear();
-            predictedBuffer.Reinterpret<UEntitySafe>().AddRange(output.Span);
-            if (predictedBuffer.Count == 0)
+            engine.Predicted.Clear();
+            engine.Predicted.Reinterpret<UEntitySafe>().AddRange(output.Span);
+            if (engine.Predicted.Count == 0)
             {
                 RhythmCommandUtility.GetCommand(
-                    cmd,
-                    commands.AsSpan(0, count), buffer.Reinterpret<FlowPressure>(), output,
-                    true, settings.BeatInterval
-                );
+                    Cmd,
+                    commands.Span, engine.Progress.Reinterpret<FlowPressure>(), output,
+                    true, engine.Settings.BeatInterval);
                 if (output.Count > 0)
                 {
-                    predictedBuffer.Reinterpret<UEntitySafe>().AddRange(output.Span);
+                    engine.Predicted.Reinterpret<UEntitySafe>().AddRange(output.Span);
                 }
 
                 continue;
@@ -78,27 +65,27 @@ public partial struct GetNextCommandEngineSystem : ISystem
 
 
             // this is so laggy clients don't have a weird things when their command has been on another beat on the server
-            var targetBeat = buffer[^1].Value.FlowBeat + 1;
+            var targetBeat = engine.Progress[^1].Value.FlowBeat + 1;
 
-            executing.Previous = executing.CommandTarget;
-            executing.CommandTarget = output[0];
-            executing.ActivationBeatStart = targetBeat;
+            engine.Executing.Previous = engine.Executing.CommandTarget;
+            engine.Executing.CommandTarget = output[0];
+            engine.Executing.ActivationBeatStart = targetBeat;
 
-            var beatDuration = cmd.ReadCommandDuration(executing.CommandTarget.Handle).Value;
+            var beatDuration = Cmd.ReadCommandDuration(engine.Executing.CommandTarget.Handle).Value;
 
-            executing.ActivationBeatEnd = targetBeat + beatDuration;
-            executing.WaitingForApply = true;
+            engine.Executing.ActivationBeatEnd = targetBeat + beatDuration;
+            engine.Executing.WaitingForApply = true;
 
             var power = 0.0f;
-            for (var i = 0; i != buffer.Count; i++)
+            for (var i = 0; i != engine.Progress.Count; i++)
             {
                 // perfect
-                if (buffer[i].Value.GetAbsoluteScore() <= 0.16f)
+                if (engine.Progress[i].Value.GetAbsoluteScore() <= 0.16f)
                     power += 1.0f;
             }
 
-            executing.__ref.Power = power / buffer.Count;
-            buffer.Clear();
+            engine.Executing.Power = power / engine.Progress.Count;
+            engine.Progress.Clear();
         }
     }
 }

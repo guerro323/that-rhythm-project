@@ -1,19 +1,30 @@
 using revecs;
 using revecs.Systems;
+using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
 public static partial class RhythmEngineExecutionGroup
 {
-    public partial struct Begin : ISystem
+    public partial struct Begin : IRevolutionSystem
     {
-        [RevolutionSystem]
-        private static void Method() { }
+        public void Constraints(in SystemObject sys)
+        {
+        }
+
+        public void Body()
+        {
+        }
     }
     
-    public partial struct End : ISystem
+    public partial struct End : IRevolutionSystem
     {
-        [RevolutionSystem, DependOn(typeof(Begin), true)]
-        private static void Method() { }
+        public void Constraints(in SystemObject sys)
+        {
+        }
+
+        public void Body()
+        {
+        }
     }
 }

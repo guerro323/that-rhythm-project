@@ -1,27 +1,30 @@
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
-using revecs;
-using revecs.Systems;
+using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ResetStateOnStoppedSystem : ISystem
+public partial struct ResetStateOnStoppedSystem : IRevolutionSystem
 {
-    [RevolutionSystem]
-    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
-    [DependOn(typeof(ApplyTagsSystem))]
-    [DependOn(typeof(ProcessSystem))]
-    private static void Method([Query] q<
-        Write<GameComboState>,
-        Write<RhythmEngineRecoveryState>,
-        
-        None<RhythmEngineIsPlaying>,
-        None<RhythmEngineIsPaused>
-    > engines)
+    public void Constraints(in SystemObject sys)
     {
-        foreach (var (combo, recovery) in engines)
+        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
+        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
         {
-            combo.__ref = default;
-            recovery.__ref = default;
+            sys.DependOn<ApplyTagsSystem>();
+            sys.DependOn<ProcessSystem>();
+        }
+    }
+
+    public void Body()
+    {
+        foreach (var engine in RequiredQuery(
+                     Write<GameComboState>(),
+                     Write<RhythmEngineRecoveryState>(),
+                     None<RhythmEngineIsPlaying>(),
+                     None<RhythmEngineIsPaused>()))
+        {
+            engine.GameComboState = default;
+            engine.RhythmEngineRecoveryState = default;
         }
     }
 }

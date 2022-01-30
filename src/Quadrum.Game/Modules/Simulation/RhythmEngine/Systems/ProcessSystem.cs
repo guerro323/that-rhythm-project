@@ -1,52 +1,49 @@
+using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
-using revecs;
-using revecs.Systems;
+using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ProcessSystem : ISystem
+public partial struct ProcessSystem : IRevolutionSystem,
+    RhythmEngineIsPlaying.Cmd.IAdmin
 {
-    // Without prediction system for now
-
-    [RevolutionSystem]
-    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
-    [DependOn(typeof(ApplyTagsSystem))]
-    private static void Method(
-        [Singleton] GameTimeSingleton time,
-        [Cmd] c<RhythmEngineIsPlaying.Cmd.IAdmin> cmd,
-        [Query, revecs.Optional] qEngines<
-            Read<RhythmEngineController>,
-            Read<RhythmEngineSettings>,
-            Write<RhythmEngineState>,
-            // Require rhythm engine to be in playing state.
-            // The component will get removed if state.Elapsed is less than 0.
-            With<RhythmEngineIsPlaying>
-        > engines
-    )
+    public void Constraints(in SystemObject sys)
     {
-        foreach (var (entity, controller, settings, state) in engines)
+        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
+        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
         {
-            if (controller.StartTime != state.PreviousStartTime)
-            {
-                state.PreviousStartTime = controller.StartTime;
-                // TODO: add events and later prediction will need to recalculate 'state.Elapsed'
+            sys.DependOn<ApplyTagsSystem>();
+        }
+    }
 
-                state.Elapsed = time.Total - controller.StartTime;
+    public void Body()
+    {
+        var time = RequiredResource<GameTime>();
+        foreach (var engine in RequiredQuery(
+                     Write<RhythmEngineState>("State"),
+                     Read<RhythmEngineSettings>("Settings"),
+                     Read<RhythmEngineController>("Controller"),
+                     All<RhythmEngineIsPlaying>()))
+        {
+            if (engine.Controller.StartTime != engine.State.PreviousStartTime)
+            {
+                engine.State.PreviousStartTime = engine.Controller.StartTime;
+                engine.State.Elapsed = time.Total - engine.Controller.StartTime;
             }
 
-            state.Elapsed += time.Delta;
+            engine.State.Elapsed += time.Delta;
 
-            if (state.Elapsed < TimeSpan.Zero)
+            if (engine.State.Elapsed < TimeSpan.Zero)
             {
-                cmd.RemoveRhythmEngineIsPlaying(entity);
+                Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
             }
 
-            var nextCurrentBeats = RhythmEngineUtility.GetActivationBeat(state.__ref, settings.__ref);
-            if (state.CurrentBeat != nextCurrentBeats)
-                state.NewBeatTick = (uint) time.Frame;
+            var nextCurrentBeats = RhythmEngineUtility.GetActivationBeat(engine.State, engine.Settings);
+            if (engine.State.CurrentBeat != nextCurrentBeats)
+                engine.State.NewBeatTick = (uint) time.Frame;
 
-            state.CurrentBeat = nextCurrentBeats;
+            engine.State.CurrentBeat = nextCurrentBeats;
         }
     }
 }

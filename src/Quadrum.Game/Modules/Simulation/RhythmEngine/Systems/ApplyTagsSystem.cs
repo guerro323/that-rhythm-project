@@ -1,37 +1,35 @@
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
-using revecs;
-using revecs.Systems;
+using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ApplyTagsSystem : ISystem
+public partial struct ApplyTagsSystem : IRevolutionSystem,
+    RhythmEngineIsPlaying.Cmd.IAdmin,
+    RhythmEngineIsPaused.Cmd.IAdmin
 {
-    [RevolutionSystem]
-    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
-    private static void Method(
-        [Query] eq<
-            Read<RhythmEngineController>
-        > query,
-        [Cmd] ec<
-            RhythmEngineIsPlaying.Cmd.IAdmin,
-            RhythmEngineIsPaused.Cmd.IAdmin
-        > cmd)
+    public void Constraints(in SystemObject sys)
     {
-        foreach (var (handle, controller) in query)
+        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
+        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+    }
+
+    public void Body()
+    {
+        foreach (var engine in RequiredQuery(Read<RhythmEngineController>("Controller")))
         {
-            switch (controller.State)
+            switch (engine.Controller.State)
             {
                 case RhythmEngineController.EState.Playing:
-                    cmd.AddRhythmEngineIsPlaying(handle);
-                    cmd.RemoveRhythmEngineIsPaused(handle);
+                    Cmd.AddRhythmEngineIsPlaying(engine.Handle);
+                    Cmd.RemoveRhythmEngineIsPaused(engine.Handle);
                     break;
                 case RhythmEngineController.EState.Paused:
-                    cmd.RemoveRhythmEngineIsPlaying(handle);
-                    cmd.AddRhythmEngineIsPaused(handle);
+                    Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
+                    Cmd.AddRhythmEngineIsPaused(engine.Handle);
                     break;
                 case RhythmEngineController.EState.Stopped:
-                    cmd.RemoveRhythmEngineIsPlaying(handle);
-                    cmd.RemoveRhythmEngineIsPaused(handle);
+                    Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
+                    Cmd.RemoveRhythmEngineIsPaused(engine.Handle);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

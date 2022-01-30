@@ -1,37 +1,37 @@
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
-using revecs;
-using revecs.Systems;
+using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ResizeCommandBufferSystem : ISystem
+public partial struct ResizeCommandBufferSystem : IRevolutionSystem
 {
-    private partial struct EngineQuery : IQuery<
-        Write<RhythmEngineCommandProgress>,
-        Read<RhythmEngineState>,
-        Read<RhythmEngineSettings>,
-        Read<RhythmEngineRecoveryState>
-    >
+    public void Constraints(in SystemObject sys)
     {
+        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
+        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        {
+            sys.DependOn<GetNextCommandEngineSystem>();
+        }
     }
 
-    [RevolutionSystem]
-    [DependOn(typeof(RhythmEngineExecutionGroup.Begin)), AddForeignDependency(typeof(RhythmEngineExecutionGroup.End))]
-    [DependOn(typeof(GetNextCommandEngineSystem))]
-    private static void Method([Query] EngineQuery query)
+    public void Body()
     {
-        foreach (var (buffer, state, settings, recovery) in query)
+        foreach (var engine in RequiredQuery(
+                     Write<RhythmEngineCommandProgress>("Buffer"),
+                     Read<RhythmEngineState>("State"),
+                     Read<RhythmEngineSettings>("Settings"),
+                     Read<RhythmEngineRecoveryState>("Recovery")))
         {
-            var progress = buffer.Reinterpret<FlowPressure>();
+            var progress = engine.Buffer.Reinterpret<FlowPressure>();
 
-            var flowBeat = RhythmEngineUtility.GetFlowBeat(state.__ref, settings.__ref);
+            var flowBeat = RhythmEngineUtility.GetFlowBeat(engine.State, engine.Settings);
             var mercy = 0; // todo: when on authoritative server, increment it by one
             for (var i = 0; i != progress.Count; i++)
             {
                 var currCommand = progress[i];
-                if (flowBeat >= currCommand.FlowBeat + mercy + settings.MaxBeats
-                    || recovery.__ref.IsRecovery(flowBeat))
+                if (flowBeat >= currCommand.FlowBeat + mercy + engine.Settings.MaxBeats
+                    || engine.Recovery.IsRecovery(flowBeat))
                 {
                     progress.RemoveAt(i--);
                 }
