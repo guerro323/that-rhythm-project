@@ -3,24 +3,25 @@ using revghost.IO.Storage;
 
 namespace Quadrum.Game.BGM;
 
-public class BgmContainerStorage : IStorage
+public class BgmContainerStorage
 {
-    public readonly IStorage parent;
+    public readonly MultiStorage parent;
 
-    public BgmContainerStorage(IStorage parent)
+    public BgmContainerStorage()
     {
-        this.parent = parent;
+        parent = new MultiStorage();
     }
 
     public string CurrentPath => parent.CurrentPath;
 
-    public void GetFiles<TList>(string pattern, TList listToFill)
-        where TList : IList<IFile> => parent.GetFiles(pattern, listToFill);
-    public IStorage GetSubStorage(string path) => parent.GetSubStorage(path);
-		
+    public void AddStorage(IStorage storage)
+    {
+        parent.Add(storage);
+    }
+    
     public async IAsyncEnumerable<BgmFile> GetBgmAsync(string pattern)
     {
-        using var files = this.GetPooledFiles(pattern);
+        using var files = parent.GetPooledFiles(pattern + ".zip");
         foreach (var f in files)
         {
             var bgm = new BgmFile(f);

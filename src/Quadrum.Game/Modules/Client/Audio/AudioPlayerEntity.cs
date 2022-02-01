@@ -1,5 +1,6 @@
 using DefaultEcs;
 using DefaultEcs.Resource;
+using GameHost.Audio;
 using GameHost.Audio.Players;
 using revghost.IO.Storage;
 using revghost.Utility;
@@ -31,9 +32,19 @@ public struct AudioPlayerEntity : IDisposable
         
     }
 
+    private void SetAudio(AudioResource resource)
+    {
+        if (!Original.TryGet(out AudioResource other) || other != resource)
+        {
+            Original.Set(resource);
+            // TODO: the audio server should do that automatically
+            Original.Remove<Wav>();
+        }
+    }
+
     public void SetAudio(Entity audioEntity)
     {
-        Original.Set(audioEntity.Get<AudioResource>());
+        SetAudio(audioEntity.Get<AudioResource>());
     }
 
     public void SetAudio(IFile file)

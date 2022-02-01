@@ -17,6 +17,9 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
     {
         sys.DependOn<RhythmEngineExecutionGroup.Begin>();
         sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        {
+            sys.DependOn<OnRhythmInputSystem>();
+        }
     }
     
     public void Body()

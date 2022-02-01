@@ -1,4 +1,5 @@
-﻿using revghost;
+﻿using Quadrum.Game.BGM;
+using revghost;
 using revghost.Module;
 
 namespace Quadrum.Game;
@@ -7,6 +8,7 @@ public class Module : HostModule
 {
     public Module(HostRunnerScope scope) : base(scope)
     {
+        scope.Context.Register(new BgmContainerStorage());
     }
 
     protected override void OnInit()
