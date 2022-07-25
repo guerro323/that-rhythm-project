@@ -1,3 +1,4 @@
+using System;
 using DefaultEcs;
 using DefaultEcs.Resource;
 using GameHost.Audio;
@@ -37,8 +38,6 @@ public struct AudioPlayerEntity : IDisposable
         if (!Original.TryGet(out AudioResource other) || other != resource)
         {
             Original.Set(resource);
-            // TODO: the audio server should do that automatically
-            Original.Remove<Wav>();
         }
     }
 
@@ -56,7 +55,7 @@ public struct AudioPlayerEntity : IDisposable
     {
         Original.Remove<StopAudioRequest>();
         Original.Remove<PauseAudioRequest>();
-        Original.Remove<AudioDelayComponent>();
+        Original.Remove<AudioStartTimeComponent>();
 
         Original.Set(new PlayAudioRequest());
     }
@@ -65,7 +64,7 @@ public struct AudioPlayerEntity : IDisposable
     {
         Original.Remove<PlayAudioRequest>();
         Original.Remove<PauseAudioRequest>();
-        Original.Remove<AudioDelayComponent>();
+        Original.Remove<AudioStartTimeComponent>();
 
         Original.Set(new StopAudioRequest());
     }
@@ -83,7 +82,7 @@ public struct AudioPlayerEntity : IDisposable
         Original.Remove<StopAudioRequest>();
         Original.Remove<PauseAudioRequest>();
 
-        Original.Set(new AudioDelayComponent(delay));
+        Original.Set(new AudioStartTimeComponent(delay));
         Original.Set(new PlayAudioRequest());
     }
 

@@ -1,8 +1,9 @@
+using System;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 
-public static class RhythmEngineUtility
+public static class RhythmUtility
 {
     public static int GetActivationBeat(in TimeSpan elapsed, in TimeSpan interval)
     {

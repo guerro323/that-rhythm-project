@@ -1,6 +1,7 @@
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Commands.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
+using Quadrum.Game.Utilities;
 using revecs.Core;
 using revecs.Extensions.Generator.Commands;
 using revecs.Systems.Generator;
@@ -15,8 +16,7 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
 {
     public void Constraints(in SystemObject sys)
     {
-        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
-        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        sys.SetGroup<RhythmEngineExecutionGroup>();
         {
             sys.DependOn<OnRhythmInputSystem>();
         }

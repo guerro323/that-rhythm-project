@@ -1,4 +1,6 @@
-﻿namespace GameHost.Audio.Players;
+﻿using System;
+
+namespace GameHost.Audio.Players;
 
 /// <summary>
 ///     Manage the volume of an <see cref="IAudioPlayerComponent" />

@@ -1,3 +1,4 @@
+using System;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine;
@@ -42,8 +43,8 @@ public struct FlowPressure
 
     public FlowPressure(int keyId, TimeSpan time, TimeSpan beatInterval)
     {
-        FlowBeat = RhythmEngineUtility.GetFlowBeat(time, beatInterval);
-        Score    = RhythmEngineUtility.GetScore(time, beatInterval);
+        FlowBeat = RhythmUtility.GetFlowBeat(time, beatInterval);
+        Score    = RhythmUtility.GetScore(time, beatInterval);
 
         KeyId = keyId;
         Time  = time;

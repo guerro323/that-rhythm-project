@@ -4,6 +4,7 @@ using DefaultEcs;
 using Quadrum.Game.Modules.Client.Audio.Client;
 using revghost;
 using revghost.Domains;
+using revghost.Domains.Time;
 using revghost.Ecs;
 using revghost.Injection;
 using revghost.Injection.Dependencies;
@@ -32,13 +33,20 @@ public class TestSoundSystem : AppSystem
         Entity audio;
         {
             using var files = _storage.GetPooledFiles("fever_entrance_0.ogg");
-            
+
             audio = _audioClient.CreateAudio(files.First());
 
             Console.WriteLine(files.First().FullName);
         }
-        var player = _audioClient.CreatePlayer();
-        player.SetAudio(audio);
-        player.Play();
+
+        (Dependencies as DependencyCollection).Context.TryGet(out WorldTime worldTime);
+        for (var i = 0; i < 16; i++)
+        {
+            var player = _audioClient.CreatePlayer();
+            player.SetAudio(audio);
+            player.PlayDelayed(worldTime.Total
+                .Add(TimeSpan.FromSeconds(1))
+                .Add(TimeSpan.FromMilliseconds(4000 * i)));
+        }
     }
 }

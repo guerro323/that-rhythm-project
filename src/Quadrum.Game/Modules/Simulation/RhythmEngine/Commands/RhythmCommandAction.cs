@@ -1,3 +1,5 @@
+using System;
+
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Commands;
 
 public struct Beat

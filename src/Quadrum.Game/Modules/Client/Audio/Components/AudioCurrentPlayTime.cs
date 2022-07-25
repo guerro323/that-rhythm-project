@@ -1,4 +1,6 @@
-﻿namespace GameHost.Audio.Players;
+﻿using System;
+
+namespace GameHost.Audio.Players;
 
 public struct AudioCurrentPlayTime
 {

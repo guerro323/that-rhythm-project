@@ -1,23 +1,138 @@
-﻿using System.Runtime.Loader;
-using System.Runtime.Versioning;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Loader;
+using System.Text;
+using GDNative;
 using GodotCLR;
 using GodotCLR.HighLevel;
+using Microsoft.VisualBasic;
 using revghost;
 using revghost.Domains;
-using revghost.Injection;
 using revghost.IO.Storage;
 using revghost.Module.Storage;
-using revghost.Shared.Collections;
 
 namespace Quadrum.Export.Godot;
 
-public class Program
-{    
+/*public unsafe struct GDNativeInterface
+{
+    public uint version_major;
+    public uint version_minor;
+    public uint version_patch;
+    public char* version_string;
+
+    public delegate*<uint, void*> mem_alloc;
+    public delegate*<void*, uint, void*> mem_realloc;
+    public delegate*<void*, void> mem_free;
+    public delegate*<char*, char*, char*, int, void> print_error;
+}*/
+
+[StructLayout(LayoutKind.Explicit)]
+unsafe struct ObjData
+{
+    [FieldOffset(0)]
+    public long id;
+    [FieldOffset(sizeof(long))]
+    public void* obj;
+}
+
+public unsafe class Program
+{
+    private static GDNativeInterface* _interface;
+    private static void* _library;
+    
+    [UnmanagedCallersOnly(EntryPoint = "my_lib_init", CallConvs = new []{typeof(CallConvCdecl)})]
+    public static byte GodotLoad(GDNativeInterface* gdInterface, void* gdLibrary, GDNativeInitialization* gdInit)
+    {
+        Console.WriteLine("\n\n\nomg it's C# !\n\n\n");
+
+        gdInit->initialize = &InitializeLevel;
+        gdInit->deinitialize = &DeinitializeLevel;
+        gdInit->minimum_initialization_level = GDNativeInitializationLevel.GDNATIVE_INITIALIZATION_SCENE;
+
+        _interface = gdInterface;
+        _library = gdLibrary;
+        
+        return 1;
+    }
+
+    [UnmanagedCallersOnly(CallConvs = new[] {typeof(CallConvCdecl)})]
+    private static void InitializeLevel(void* data, GDNativeInitializationLevel level)
+    {
+        Console.WriteLine($"Init(level={level})");
+
+        if (level == GDNativeInitializationLevel.GDNATIVE_INITIALIZATION_SCENE)
+        {
+            Native.Load(_interface, _library);
+            UtilityFunctions.Print($"Hello from C# level={level}");
+
+            GD.RegisterClass<int>("MyClass", "Node3D");
+            GD.AddMethod<int>("MyClass", "PrintText",
+                (ref byte methodData, ref int instance, VariantMethodArgs args) =>
+                {
+                    UtilityFunctions.Print($"Text from GDScript: {args[0]}");
+                    return default;
+                },
+                new (Variant.EType, string)[]
+                {
+                    (Variant.EType.STRING, "text")
+                }, Variant.EType.NIL,
+                GDNativeExtensionClassMethodFlags.GDNATIVE_EXTENSION_METHOD_FLAG_STATIC
+            );
+            GD.AddMethod<int>("MyClass", "PrintTextNonStatic",
+                (ref byte methodData, ref int instance, VariantMethodArgs args) =>
+                {
+                    UtilityFunctions.Print($"Text from GDScript: {args[0]}");
+                    return default;
+                },
+                new (Variant.EType, string)[]
+                {
+                    (Variant.EType.STRING, "text")
+                }, Variant.EType.NIL,
+                GDNativeExtensionClassMethodFlags.GDNATIVE_EXTENSION_METHOD_FLAG_NORMAL
+            );
+            GD.AddMethod<int>("MyClass", "update",
+                (ref byte methodData, ref int instance, VariantMethodArgs args) =>
+                {
+                    UtilityFunctions.Print($"update {args[0].Float}");
+                    return default;
+                },
+                new (Variant.EType, string)[]
+                {
+                    (Variant.EType.FLOAT, "dt")
+                }, Variant.EType.NIL,
+                GDNativeExtensionClassMethodFlags.GDNATIVE_EXTENSION_METHOD_FLAG_NORMAL);
+
+            Task.Delay(1000).ContinueWith(_ =>
+            {
+                var mainLoop = GD.Engine.GetMainLoop();
+                var scene = GD.SceneTree.GetCurrentScene(mainLoop);
+                var node = GD.ResourceLoader.Load("res://hello.tscn")
+                    .To<GD.PackedScene>()
+                    .Duplicate()
+                    .Instantiate();
+
+                var root = new GD.Node(scene);
+                root.AddChild(node);
+                node.CallDeferred("say_hi", default);
+                node.CallDeferred("set_text", stackalloc[]
+                {
+                    new Variant("Text from C#!")
+                });
+            });
+        }
+    }
+    
+    [UnmanagedCallersOnly(CallConvs = new[] {typeof(CallConvCdecl)})]
+    private static void DeinitializeLevel(void* data, GDNativeInitializationLevel level)
+    {
+        Console.WriteLine($"Deinit(level={level})");
+    }
+    
     public static unsafe int Load(IntPtr ptr, int args)
     {
-        Console.WriteLine("Program - Load");
+        return 0;
         
-        GodotHL.Load(ptr, OnUpdate, OnClean, OnExchange);
+        /*GodotHL.Load(ptr, OnUpdate, OnClean, OnExchange);
 
         var directory = Native.GetDirectory();
         for (var i = 0; i < directory.Length; i++)
@@ -56,17 +171,13 @@ public class Program
             }
         };
             
-        OnInit(directory);
+        OnInit(directory);*/
         return 0;
     }
 
     private static void OnExchange(Variant subject, VariantMethodArgs args, VariantArgBuilder ret)
     {
-        GodotCLR.Godot.Print(subject.AsString());
-        if (subject.SequenceEquals("party_toggle"))
-        {
-            ret.Add("YEAH");
-        }
+        // start bootstraps from this
     }
 
     private static GhostRunner runner;

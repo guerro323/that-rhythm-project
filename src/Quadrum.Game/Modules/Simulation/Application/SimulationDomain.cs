@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using DefaultEcs;
 using revecs.Core;
@@ -52,6 +53,9 @@ public class SimulationDomain : CommonDomainThreadListener
 
     public SimulationDomain(Scope scope, Entity domainEntity) : base(scope, domainEntity)
     {
+        if (!scope.Context.TryGet(out _worker))
+            _worker = new DomainWorker("Simulation Domain");
+
         Scope = new SimulationScope(DomainScope);
         {
             World = Scope.World;
@@ -63,13 +67,10 @@ public class SimulationDomain : CommonDomainThreadListener
 
             Scope.Context.Register(WorldTime = _worldTime = new ManagedWorldTime());
             Scope.Context.Register(UpdateLoop = _updateLoop = new DefaultDomainUpdateLoopSubscriber(World));
+            Scope.Context.Register<IReadOnlyDomainWorker>(_worker);
         }
 
         _targetFrequency = TimeSpan.FromMilliseconds(10);
-
-        if (!scope.Context.TryGet(out _worker))
-            _worker = new DomainWorker("Simulation Domain");
-
         _timeEntity = GameWorld.CreateEntity();
 
         GameWorld.AddComponent(_timeEntity, GameTime.Type.GetOrCreate(GameWorld), default);

@@ -1,3 +1,5 @@
+using System;
+
 namespace PataNext.Game.Client.Core.Inputs;
 
 using Frame = Int32;

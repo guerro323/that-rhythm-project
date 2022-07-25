@@ -1,3 +1,4 @@
+using System;
 using revecs.Core;
 using revecs.Extensions.Generator.Components;
 

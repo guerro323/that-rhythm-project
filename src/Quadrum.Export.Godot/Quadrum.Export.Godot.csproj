@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>exe</OutputType>
+        <OutputType>Library</OutputType>
         <EnableDynamicLoading>true</EnableDynamicLoading>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -13,15 +13,27 @@
         <!-- Nuget warn about packages downgrade, but they're actually intended (since they're local) -->
         <NoWarn>$(NoWarn);NU1605</NoWarn>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <!--<DnneAddGeneratedBinaryToProject>true</DnneAddGeneratedBinaryToProject>
+        <DnneCompilerUserFlags Condition="'$(BuildAsCPPWithMSVC)'=='true'">/TP </DnneCompilerUserFlags>
+        <DnneCompilerCommand Condition="'$(BuildWithGCC)'=='true'">gcc</DnneCompilerCommand>
+        <DnneCompilerCommand Condition="'$(BuildWithGPP)'=='true'">g++</DnneCompilerCommand>
+        <DnneCompilerCommand Condition="'$(BuildWithClangPP)'=='true'">clang++</DnneCompilerCommand>
+
+        <DnneCompilerUserFlags>$(DnneCompilerUserFlags)$(MSBuildThisFileDirectory)override.c</DnneCompilerUserFlags>-->
+    </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="GodotCLR" Version="0.0.0-local" />
+        <PackageReference Include="DNNE" Version="1.0.32" />
         <PackageReference Include="revghost" Version="0.0.0-local" />
-        <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" />
+        <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Quadrum.Game\Quadrum.Game.csproj" />
+      <ProjectReference Include="/media/guerro/FastBoi/Projets/GodotCLR/GodotCLR.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,9 +42,15 @@
 
     <ItemGroup>
       <None Remove="Quadrum.Export.Godot.runtimeconfig.json" />
-      <Content Include="Quadrum.Export.Godot.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+      <None Remove="GDNative\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="GDNative\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="GDNative\**" />
     </ItemGroup>
 
     <Target Name="CopyModule" AfterTargets="Build">
@@ -41,6 +59,7 @@
         </ItemGroup>
 
         <Copy SourceFiles="@(ModuleAsm)" DestinationFolder="../../Godot/project/dotnet" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ModuleAsm)" DestinationFolder="/media/guerro/FastBoi/Projets/Tests/godot/zig_lib/_net/" SkipUnchangedFiles="true" />
     </Target>
 
 </Project>

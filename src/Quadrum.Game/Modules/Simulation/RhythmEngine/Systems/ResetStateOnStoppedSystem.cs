@@ -1,4 +1,5 @@
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
+using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
@@ -7,8 +8,7 @@ public partial struct ResetStateOnStoppedSystem : IRevolutionSystem
 {
     public void Constraints(in SystemObject sys)
     {
-        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
-        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        sys.SetGroup<RhythmEngineExecutionGroup>();
         {
             sys.DependOn<ApplyTagsSystem>();
             sys.DependOn<ProcessSystem>();

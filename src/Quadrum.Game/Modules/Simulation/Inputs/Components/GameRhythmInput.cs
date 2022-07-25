@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using revecs.Extensions.Buffers;
 using revecs.Extensions.Generator.Components;
@@ -8,7 +9,6 @@ public partial struct GameRhythmInput : ISparseComponent
 {
     public struct RhythmAction
     {
-        // todo:
         public InterFramePressAction InterFrame;
         // Is the button currently being held?
         public bool IsActive;

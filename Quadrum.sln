@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quadrum.Export.Desktop", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quadrum.Export.Godot", "src\Quadrum.Export.Godot\Quadrum.Export.Godot.csproj", "{F9F00F1A-9D44-405F-891A-D5263F1DE87F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quadrum.Export.Godot.Tests", "src\Quadrum.Export.Godot.Tests\Quadrum.Export.Godot.Tests.csproj", "{51574C60-EAE1-4ECB-BF45-C63D28A81D38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{F9F00F1A-9D44-405F-891A-D5263F1DE87F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9F00F1A-9D44-405F-891A-D5263F1DE87F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9F00F1A-9D44-405F-891A-D5263F1DE87F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51574C60-EAE1-4ECB-BF45-C63D28A81D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51574C60-EAE1-4ECB-BF45-C63D28A81D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51574C60-EAE1-4ECB-BF45-C63D28A81D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51574C60-EAE1-4ECB-BF45-C63D28A81D38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

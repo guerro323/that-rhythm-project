@@ -3,6 +3,7 @@ using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.Players;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
+using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
@@ -12,8 +13,7 @@ public partial struct OnRhythmInputSystem : IRevolutionSystem,
 {
     public void Constraints(in SystemObject sys)
     {
-        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
-        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        sys.SetGroup<RhythmEngineExecutionGroup>();
     }
 
     public void Body()
@@ -36,7 +36,7 @@ public partial struct OnRhythmInputSystem : IRevolutionSystem,
 
             ref readonly var input = ref Cmd.ReadGameRhythmInput(engine.Relative);
 
-            var flowBeat = RhythmEngineUtility.GetFlowBeat(engine.State, engine.Settings);
+            var flowBeat = RhythmUtility.GetFlowBeat(engine.State, engine.Settings);
             // Don't accept inputs when the rhythm engine hasn't yet started
             if (flowBeat < 0)
                 return;
@@ -51,11 +51,11 @@ public partial struct OnRhythmInputSystem : IRevolutionSystem,
                 if (action.InterFrame.IsReleased(time.FrameRange) && (!action.IsSliding || engine.Progress.Count == 0))
                     continue;
 
-                var cmdChainEndFlow = RhythmEngineUtility.GetFlowBeat(
+                var cmdChainEndFlow = RhythmUtility.GetFlowBeat(
                     engine.CommandState.ChainEndTime,
                     engine.Settings.BeatInterval
                 );
-                var cmdEndFlow = RhythmEngineUtility.GetFlowBeat(
+                var cmdEndFlow = RhythmUtility.GetFlowBeat(
                     engine.CommandState.EndTime,
                     engine.Settings.BeatInterval
                 );

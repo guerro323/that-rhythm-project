@@ -9,6 +9,8 @@ public partial struct RhythmEngineLayout : IEntityLayoutComponent
     {
         componentTypes.AddRange(new ComponentType[]
         {
+            RhythmEngineDescription.Type.GetOrCreate(world),
+            
             RhythmEngineController.Type.GetOrCreate(world),
             RhythmEngineState.Type.GetOrCreate(world),
             RhythmEngineSettings.Type.GetOrCreate(world),

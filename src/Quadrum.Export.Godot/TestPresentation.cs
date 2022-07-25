@@ -3,11 +3,10 @@ using Quadrum.Export.Godot.Presentation;
 using Quadrum.Game.Modules.Simulation.Common.Transform;
 using revecs.Core;
 using revghost;
-using RustTest;
 
 namespace Quadrum.Export.Godot;
 
-public class TestPresentation : PresentationGodotBaseSystem
+/*public class TestPresentation : PresentationGodotBaseSystem
 {
     public TestPresentation(Scope scope) : base(scope)
     {
@@ -49,4 +48,4 @@ public class TestPresentation : PresentationGodotBaseSystem
             node.SetPosition2D(GameWorld.GetComponentData(entity, PositionComponent.Type.GetOrCreate(GameWorld)).Value);
         }
     }
-}
+}*/

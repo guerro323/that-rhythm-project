@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+
+        <!-- Nuget warn about packages downgrade, but they're actually intended (since they're local) -->
+        <NoWarn>$(NoWarn);NU1605</NoWarn>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+        <PackageReference Include="xunit" Version="2.4.2-pre.12" />
+
+        <PackageReference Include="GodotCLR" Version="0.0.0-local" />
+        <PackageReference Include="revghost" Version="0.0.0-local" />
+        <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
+    </ItemGroup>
+
+</Project>

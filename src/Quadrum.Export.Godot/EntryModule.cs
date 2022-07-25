@@ -1,18 +1,7 @@
-using System.Diagnostics;
-using System.Numerics;
 using Quadrum.Export.Godot.Presentation;
-using Quadrum.Game.Modules.Simulation;
 using Quadrum.Game.Modules.Simulation.Application;
-using Quadrum.Game.Modules.Simulation.Common.Transform;
-using revecs;
-using revecs.Core;
-using revecs.Extensions.Generator.Commands;
-using revecs.Extensions.Generator.Components;
-using revecs.Systems;
 using revghost;
 using revghost.Module;
-using revghost.Shared.Threading.Schedulers;
-using RustTest;
 
 namespace Quadrum.Export.Godot;
 
@@ -36,7 +25,7 @@ public partial class EntryModule : HostModule
             domain.SystemGroup.Add(MoveUnit);*/
 
             new UpdatePresentationSystems(domain.Scope);
-            new TestPresentation(domain.Scope);
+            //new TestPresentation(domain.Scope);
         });
     }
 

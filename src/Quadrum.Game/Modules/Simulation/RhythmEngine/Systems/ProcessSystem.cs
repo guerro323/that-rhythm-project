@@ -1,6 +1,8 @@
+using System;
 using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
+using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
@@ -10,8 +12,7 @@ public partial struct ProcessSystem : IRevolutionSystem,
 {
     public void Constraints(in SystemObject sys)
     {
-        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
-        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        sys.SetGroup<RhythmEngineExecutionGroup>();
         {
             sys.DependOn<ApplyTagsSystem>();
         }
@@ -39,7 +40,7 @@ public partial struct ProcessSystem : IRevolutionSystem,
                 Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
             }
 
-            var nextCurrentBeats = RhythmEngineUtility.GetActivationBeat(engine.State, engine.Settings);
+            var nextCurrentBeats = RhythmUtility.GetActivationBeat(engine.State, engine.Settings);
             if (engine.State.CurrentBeat != nextCurrentBeats)
                 engine.State.NewBeatTick = (uint) time.Frame;
 

@@ -1,3 +1,4 @@
+using System;
 using DefaultEcs;
 using GameHost.Audio.Players;
 using Quadrum.Game.Modules.Client.Audio;
@@ -8,6 +9,7 @@ using revghost.Injection.Dependencies;
 using revghost.Loop.EventSubscriber;
 using revghost.Shared;
 using revghost.Shared.Collections;
+using revghost.Threading.V2.Apps;
 using revghost.Utility;
 
 namespace GameHost.Audio;
@@ -21,6 +23,7 @@ public class SoloudServerSystem : AppSystem
     private World _world;
     private IDomainUpdateLoopSubscriber _updateLoop;
     private IManagedWorldTime _worldTime;
+    private IReadOnlyDomainWorker _domainWorker;
 
     public SoloudServerSystem(Soloud soloudObj, Scope scope) : base(scope)
     {
@@ -29,6 +32,7 @@ public class SoloudServerSystem : AppSystem
         Dependencies.AddRef(() => ref _world);
         Dependencies.AddRef(() => ref _updateLoop);
         Dependencies.AddRef(() => ref _worldTime);
+        Dependencies.AddRef(() => ref _domainWorker);
     }
 
     private EntitySet _resourceSet;
@@ -109,9 +113,12 @@ public class SoloudServerSystem : AppSystem
 
             if (entity.TryGet(out uint currSoloudId))
             {
-                if (entity.TryGet(out AudioDelayComponent delay))
+                if (entity.TryGet(out AudioStartTimeComponent startTime))
                 {
-                    SoloudObj.scheduleStop(currSoloudId, delay.Delay.TotalSeconds);
+                    var delay = startTime.StartTime - _worldTime.Total - _domainWorker.RealtimeDelta;
+                    Console.WriteLine($"StopDelay: {delay.TotalSeconds:F3}s");
+                    
+                    SoloudObj.scheduleStop(currSoloudId, delay.TotalSeconds);
                 }
                 else
                 {
@@ -121,15 +128,18 @@ public class SoloudServerSystem : AppSystem
 
             uint play;
             {
-                if (entity.TryGet(out AudioDelayComponent delay))
+                if (entity.TryGet(out AudioStartTimeComponent startTime))
                 {
                     play = SoloudObj.play(wav, aPaused: 1);
 
                     var rate = SoloudObj.getSamplerate(play);
                     // TODO: investigate why it doesn't work as expect (this is the reason we force it back to 44150hz)
                     rate = 44100;
+
+                    var delay = startTime.StartTime - _worldTime.Total - _domainWorker.RealtimeDelta;
+                    Console.WriteLine($"Delay: {delay.TotalSeconds:F3}s");
                     
-                    SoloudObj.setDelaySamples(play, (uint) (rate * delay.Delay.TotalSeconds));
+                    SoloudObj.setDelaySamples(play, (uint) (rate * delay.TotalSeconds));
                     SoloudObj.setPause(play, 0);
                 }
                 else
@@ -141,17 +151,17 @@ public class SoloudServerSystem : AppSystem
             entity.Set(play);
 
             entity.Remove<PlayAudioRequest>();
-            entity.Remove<AudioDelayComponent>();
+            entity.Remove<AudioStartTimeComponent>();
         }
 
         if (entity.Has<StopAudioRequest>())
-            if (!entity.TryGet(out AudioDelayComponent delay) || worldTime.Total >= delay.Delay)
+            if (!entity.TryGet(out AudioStartTimeComponent delay) || worldTime.Total >= delay.StartTime)
             {
                 if (entity.TryGet(out uint currSoloudId))
                     SoloudObj.stop(currSoloudId);
 
                 entity.Remove<StopAudioRequest>();
-                entity.Remove<AudioDelayComponent>();
+                entity.Remove<AudioStartTimeComponent>();
             }
     }
 }

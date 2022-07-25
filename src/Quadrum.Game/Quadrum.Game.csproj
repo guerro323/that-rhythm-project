@@ -3,8 +3,10 @@
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
 
     <!-- Nuget warn about packages downgrade, but they're actually intended (since they're local) -->
     <NoWarn>$(NoWarn);NU1605</NoWarn>
@@ -12,13 +14,10 @@
   <ItemGroup>
     <PackageReference Include="CS-Script" Version="4.0.2" />
     <PackageReference Include="revecs" Version="0.0.0-local" />
-    <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" />
+    <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
     <PackageReference Include="revghost" Version="0.0.0-local" />
-    <PackageReference Include="revghost.Shared" Version="0.0.0-local" />
+    <PackageReference Include="revghost.Shared" Version="2022.713.1503" />
     <PackageReference Include="System.Runtime.Experimental" Version="6.0.0-preview.7.21377.19" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\Simulation\Units" />
   </ItemGroup>
   <!--<ItemGroup>
     <None Update="native\*">

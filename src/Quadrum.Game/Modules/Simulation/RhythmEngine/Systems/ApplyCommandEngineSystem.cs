@@ -1,6 +1,8 @@
+using System;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Commands.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
+using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
@@ -10,8 +12,7 @@ public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
 {
     public void Constraints(in SystemObject sys)
     {
-        sys.DependOn<RhythmEngineExecutionGroup.Begin>();
-        sys.AddForeignDependency<RhythmEngineExecutionGroup.End>();
+        sys.SetGroup<RhythmEngineExecutionGroup>();
         {
             sys.DependOn<GetNextCommandEngineSystem>();
         }
@@ -46,15 +47,15 @@ public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
             var rhythmActiveAtFlowBeat = engine.Executing.ActivationBeatStart;
 
             var checkStopBeat = Math.Max(engine.State.LastPressure.FlowBeat + mercy,
-                RhythmEngineUtility.GetFlowBeat(new TimeSpan(engine.CommandState.EndTimeMs * TimeSpan.TicksPerMillisecond),
+                RhythmUtility.GetFlowBeat(new TimeSpan(engine.CommandState.EndTimeMs * TimeSpan.TicksPerMillisecond),
                     engine.Settings.BeatInterval) + cmdMercy);
             if (true) // todo: !isServer && simulateTagFromEntity.Exists(entity)
                 checkStopBeat = Math.Max(checkStopBeat,
-                    RhythmEngineUtility.GetFlowBeat(new TimeSpan(engine.CommandState.EndTimeMs * TimeSpan.TicksPerMillisecond),
+                    RhythmUtility.GetFlowBeat(new TimeSpan(engine.CommandState.EndTimeMs * TimeSpan.TicksPerMillisecond),
                         engine.Settings.BeatInterval));
 
-            var flowBeat = RhythmEngineUtility.GetFlowBeat(engine.State, engine.Settings);
-            var activationBeat = RhythmEngineUtility.GetActivationBeat(engine.State, engine.Settings);
+            var flowBeat = RhythmUtility.GetFlowBeat(engine.State, engine.Settings);
+            var activationBeat = RhythmUtility.GetActivationBeat(engine.State, engine.Settings);
             if (engine.Recovery.IsRecovery(flowBeat)
                 || rhythmActiveAtFlowBeat < flowBeat && checkStopBeat < activationBeat
                 || engine.Executing.CommandTarget.Equals(default) && engine.Predicted.Count != 0 &&
