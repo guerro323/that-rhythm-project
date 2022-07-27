@@ -41,8 +41,12 @@ public unsafe class Program
     private static void* _library;
     
     [UnmanagedCallersOnly(EntryPoint = "my_lib_init", CallConvs = new []{typeof(CallConvCdecl)})]
-    public static byte GodotLoad(GDNativeInterface* gdInterface, void* gdLibrary, GDNativeInitialization* gdInit)
+    // the compiler on windows is racist and don't want to compile if we put the struct names instead of void*
+    public static byte GodotLoad(void* gdInterfaceVoid, void* gdLibrary, void* gdInitVoid)
     {
+        var gdInterface = (GDNativeInterface*) gdInterfaceVoid;
+        var gdInit = (GDNativeInitialization*) gdInitVoid;
+
         Console.WriteLine("\n\n\nomg it's C# !\n\n\n");
 
         gdInit->initialize = &InitializeLevel;
