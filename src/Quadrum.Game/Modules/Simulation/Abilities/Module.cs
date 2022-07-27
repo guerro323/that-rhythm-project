@@ -1,7 +1,10 @@
+using System;
+using Quadrum.Game.Modules.Simulation.Abilities.Systems;
 using Quadrum.Game.Modules.Simulation.Application;
 using revecs.Systems.Generator;
 using revghost;
 using revghost.Module;
+using revghost.Utility;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities;
 
@@ -15,12 +18,14 @@ public class Module : HostModule
     {
         TrackDomain((SimulationDomain domain) =>
         {
-            domain.SystemGroup.Add<AbilitySystemGroup.Begin>();
+            Disposables.AddRange(new IDisposable[]
             {
-                domain.SystemGroup.Add<AbilityExecutionSystemGroup.Begin>();
-                domain.SystemGroup.Add<AbilityExecutionSystemGroup.End>();
-            }
-            domain.SystemGroup.Add<AbilitySystemGroup.End>();
+                new AbilitySystemGroup(domain.Scope),
+                new AbilityExecutionSystemGroup(domain.Scope),
+                new AbilityConditionSystemGroup(domain.Scope),
+
+                new UpdateActiveAbilitySystem(domain.Scope),
+            });
         });
     }
 }

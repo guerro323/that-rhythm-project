@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using DefaultEcs;
 using Quadrum.Game.Modules.Client.Audio.Client;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using revghost;
 using revghost.Domains;
 using revghost.Domains.Time;
@@ -13,7 +14,7 @@ using revghost.Loop.EventSubscriber;
 
 namespace Quadrum.Export.Godot;
 
-public class TestSoundSystem : AppSystem
+public class TestSoundSystem : SimulationSystem
 {
     private AudioClient _audioClient;
     private World _world;
@@ -22,10 +23,15 @@ public class TestSoundSystem : AppSystem
 
     public TestSoundSystem(IStorage storage, Scope scope) : base(scope)
     {
-        Dependencies.AddRef(() => ref _audioClient);
-        Dependencies.AddRef(() => ref _world);
+        Dependencies.Add(() => ref _audioClient);
+        Dependencies.Add(() => ref _world);
 
         _storage = storage;
+        
+        SubscribeTo<IDomainUpdateLoopSubscriber>(e =>
+        {
+            
+        });
     }
 
     protected override void OnInit()

@@ -20,7 +20,7 @@ public partial class Module : HostModule
     {
         _scope = scope;
 
-        Dependencies.AddRef(() => ref _world);
+        Dependencies.Add(() => ref _world);
     }
 
     protected override void OnInit()
@@ -41,7 +41,7 @@ public partial class Module : HostModule
         {
             Disposables.AddRange(new IDisposable[]
             {
-                new RunSystemGroupSystem(domain.Scope)
+                new RunSimulationUpdateLoopSystem(domain.Scope)
             });
         });
     }

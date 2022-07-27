@@ -17,7 +17,7 @@ public class EntryModule : HostModule
         
         TrackDomain((SimulationDomain domain) =>
         {
-            _ = new TestSoundSystem(ModuleScope.DataStorage, domain.Scope);
+            //_ = new TestSoundSystem(ModuleScope.DataStorage, domain.Scope);
         });
     }
 }

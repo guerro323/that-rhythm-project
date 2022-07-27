@@ -1,5 +1,8 @@
 using System;
 using System.ComponentModel;
+using DefaultEcs;
+using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Utilities;
 using revecs;
@@ -14,49 +17,20 @@ using revghost.Utility;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ApplyTagsSystem : IRevolutionSystem,
-    RhythmEngineIsPlaying.Cmd.IAdmin,
-    RhythmEngineIsPaused.Cmd.IAdmin
-{
-    public void Constraints(in SystemObject sys)
-    {
-        sys.SetGroup<RhythmEngineExecutionGroup>();
-    }
-
-    public void Body()
-    {
-        foreach (var engine in RequiredQuery(Read<RhythmEngineController>("Controller")))
-        {
-            switch (engine.Controller.State)
-            {
-                case RhythmEngineController.EState.Playing:
-                    Cmd.AddRhythmEngineIsPlaying(engine.Handle);
-                    Cmd.RemoveRhythmEngineIsPaused(engine.Handle);
-                    break;
-                case RhythmEngineController.EState.Paused:
-                    Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
-                    Cmd.AddRhythmEngineIsPaused(engine.Handle);
-                    break;
-                case RhythmEngineController.EState.Stopped:
-                    Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
-                    Cmd.RemoveRhythmEngineIsPaused(engine.Handle);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-    }
-}
-
-public partial class V2ApplyTagsSystem : AppSystem
+public partial class ApplyTagsSystem : SimulationSystem
 {
     private RevolutionWorld _world;
     private IDomainUpdateLoopSubscriber _updateLoop;
 
-    public V2ApplyTagsSystem(Scope scope) : base(scope)
+    public ApplyTagsSystem(Scope scope) : base(scope)
     {
-        Dependencies.AddRef(() => ref _world);
-        Dependencies.AddRef(() => ref _updateLoop);
+        Dependencies.Add(() => ref _world);
+        Dependencies.Add(() => ref _updateLoop);
+
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            b => b.SetGroup<RhythmEngineExecutionGroup>()
+        );
     }
     
     private Commands _cmd;
@@ -68,12 +42,11 @@ public partial class V2ApplyTagsSystem : AppSystem
         
         Disposables.AddRange(new IDisposable[]
         {
-            (_query = new EngineQuery(_world)).Query,
-            _updateLoop.Subscribe(OnUpdate)
+            (_query = new EngineQuery(_world)).Query
         });
     }
 
-    private void OnUpdate(WorldTime time)
+    private void OnUpdate(Entity _)
     {
         foreach (var engine in _query)
         {

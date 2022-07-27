@@ -1,30 +1,45 @@
+using DefaultEcs;
+using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Utilities;
-using revecs.Systems.Generator;
+using revecs;
+using revghost;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ResetStateOnStoppedSystem : IRevolutionSystem
+public partial class ResetStateOnStoppedSystem : SimulationSystem
 {
-    public void Constraints(in SystemObject sys)
+    public ResetStateOnStoppedSystem(Scope scope) : base(scope)
     {
-        sys.SetGroup<RhythmEngineExecutionGroup>();
-        {
-            sys.DependOn<ApplyTagsSystem>();
-            sys.DependOn<ProcessSystem>();
-        }
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            p => p
+                .SetGroup<RhythmEngineExecutionGroup>()
+                .After(typeof(ApplyTagsSystem))
+                .After(typeof(ProcessSystem))
+        );
     }
 
-    public void Body()
+    private EngineQuery _query;
+
+    protected override void OnInit()
     {
-        foreach (var engine in RequiredQuery(
-                     Write<GameComboState>(),
-                     Write<RhythmEngineRecoveryState>(),
-                     None<RhythmEngineIsPlaying>(),
-                     None<RhythmEngineIsPaused>()))
+        _query = new EngineQuery(Simulation);
+    }
+
+    private void OnUpdate(Entity _)
+    {
+        foreach (var engine in _query)
         {
             engine.GameComboState = default;
             engine.RhythmEngineRecoveryState = default;
         }
     }
+
+    private partial record struct EngineQuery : IQuery<(
+        Write<GameComboState>,
+        Write<RhythmEngineRecoveryState>,
+        None<RhythmEngineIsPlaying>,
+        None<RhythmEngineIsPaused>)>;
 }

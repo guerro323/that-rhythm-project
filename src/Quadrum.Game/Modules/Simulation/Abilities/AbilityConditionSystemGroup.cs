@@ -1,5 +1,7 @@
 using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
+using revghost;
+using revghost.Ecs;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities;
 
@@ -7,36 +9,22 @@ namespace Quadrum.Game.Modules.Simulation.Abilities;
 /// <summary>
 /// Represent a group of ability systems that will update their condition
 /// </summary>
-public partial class AbilityConditionSystemGroup : ISystemGroup
+public partial class AbilityConditionSystemGroup : BaseSystemGroup<AbilityConditionSystemGroup>
 {
-    public partial struct Begin : IRevolutionSystem
+    protected override void SetBegin(OrderBuilder builder)
     {
-        public void Constraints(in SystemObject sys)
-        {
-            sys.DependOn<AbilitySystemGroup.Begin>();
-        }
-
-        public void Body()
-        {
-        }
+        base.SetBegin(builder);
+        builder.SetGroup<AbilitySystemGroup>();
     }
 
-    public partial struct End : IRevolutionSystem
+    protected override void SetEnd(OrderBuilder builder)
     {
-        public void Constraints(in SystemObject sys)
-        {
-            sys.DependOn<Begin>();
-            sys.AddForeignDependency<AbilitySystemGroup.End>();
-        }
-
-        public void Body()
-        {
-        }
+        base.SetEnd(builder);
+        builder.SetGroup<AbilitySystemGroup>();
     }
-
-    public static void AddToGroup(SystemObject systemObject)
+    
+    public AbilityConditionSystemGroup(Scope scope) : base(scope)
     {
-        systemObject.DependOn<Begin>();
-        systemObject.AddForeignDependency<End>();
+        
     }
 }

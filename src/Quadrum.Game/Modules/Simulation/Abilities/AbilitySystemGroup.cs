@@ -1,36 +1,20 @@
+using Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
+using revghost;
+using revghost.Ecs;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities;
 
-public partial class AbilitySystemGroup : ISystemGroup
+public partial class AbilitySystemGroup : BaseSystemGroup<AbilitySystemGroup>
 {
-    public partial struct Begin : IRevolutionSystem
+    public AbilitySystemGroup(Scope scope) : base(scope)
     {
-        public void Constraints(in SystemObject sys)
-        {
-        }
-
-        public void Body()
-        {
-        }
     }
 
-    public partial struct End : IRevolutionSystem
+    protected override void SetBegin(OrderBuilder builder)
     {
-        public void Constraints(in SystemObject sys)
-        {
-            sys.DependOn<Begin>();
-        }
-
-        public void Body()
-        {
-        }
-    }
-
-    public static void AddToGroup(SystemObject systemObject)
-    {
-        systemObject.DependOn<Begin>();
-        systemObject.AddForeignDependency<End>();
+        base.SetBegin(builder);
+        builder.AfterGroup<RhythmEngineExecutionGroup>();
     }
 }

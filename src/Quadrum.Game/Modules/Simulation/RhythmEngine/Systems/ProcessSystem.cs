@@ -1,31 +1,43 @@
 using System;
+using DefaultEcs;
 using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using Quadrum.Game.Utilities;
-using revecs.Systems.Generator;
+using revecs;
+using revghost;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ProcessSystem : IRevolutionSystem,
-    RhythmEngineIsPlaying.Cmd.IAdmin
+public partial class ProcessSystem : SimulationSystem
 {
-    public void Constraints(in SystemObject sys)
+    public ProcessSystem(Scope scope) : base(scope)
     {
-        sys.SetGroup<RhythmEngineExecutionGroup>();
-        {
-            sys.DependOn<ApplyTagsSystem>();
-        }
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            p => p
+                .SetGroup<RhythmEngineExecutionGroup>()
+                .After(typeof(ApplyTagsSystem))
+        );
     }
 
-    public void Body()
+    private GameTimeQuery _gameTimeQuery;
+    private EngineQuery _engineQuery;
+    private Commands _cmd;
+    
+    protected override void OnInit()
     {
-        var time = RequiredResource<GameTime>();
-        foreach (var engine in RequiredQuery(
-                     Write<RhythmEngineState>("State"),
-                     Read<RhythmEngineSettings>("Settings"),
-                     Read<RhythmEngineController>("Controller"),
-                     All<RhythmEngineIsPlaying>()))
+        _gameTimeQuery = new GameTimeQuery(Simulation);
+        _engineQuery = new EngineQuery(Simulation);
+        _cmd = new Commands(Simulation);
+    }
+
+    private void OnUpdate(Entity _)
+    {
+        var time = _gameTimeQuery.First().GameTime;
+        
+        foreach (var engine in _engineQuery)
         {
             if (engine.Controller.StartTime != engine.State.PreviousStartTime)
             {
@@ -37,7 +49,7 @@ public partial struct ProcessSystem : IRevolutionSystem,
 
             if (engine.State.Elapsed < TimeSpan.Zero)
             {
-                Cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
+                _cmd.RemoveRhythmEngineIsPlaying(engine.Handle);
             }
 
             var nextCurrentBeats = RhythmUtility.GetActivationBeat(engine.State, engine.Settings);
@@ -47,4 +59,13 @@ public partial struct ProcessSystem : IRevolutionSystem,
             engine.State.CurrentBeat = nextCurrentBeats;
         }
     }
+
+    private partial record struct EngineQuery : IQuery<(
+        Write<RhythmEngineState> State,
+        Read<RhythmEngineSettings> Settings,
+        Read<RhythmEngineController> Controller,
+        All<RhythmEngineIsPlaying>)>;
+
+
+    private partial record struct Commands : RhythmEngineIsPlaying.Cmd.IAdmin;
 }

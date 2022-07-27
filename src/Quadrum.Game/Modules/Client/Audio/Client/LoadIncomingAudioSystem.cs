@@ -17,7 +17,7 @@ public class LoadIncomingAudioSystem : AppSystem
     
     public LoadIncomingAudioSystem(Scope scope) : base(scope)
     {
-        Dependencies.AddRef(() => ref _world);
+        Dependencies.Add(() => ref _world);
     }
 
     private ResourceManager _resourceManager;

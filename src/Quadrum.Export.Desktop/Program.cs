@@ -48,9 +48,21 @@ namespace Quadrum.Export.Desktop
                 return false;
             }, 0, default);*/
 
-             
-            while (ghost.Loop())
+
+            var prevMem = GC.GetTotalMemory(false);
+            while (true)
             {
+                ghost.Loop();
+                var mem = GC.GetTotalMemory(false);
+                var delta = mem - prevMem;
+                prevMem = mem;
+                if (delta != 0)
+                {
+                    Console.Write("Memory Delta: ");
+                    Console.Write(delta);
+                    Console.WriteLine("b");
+                }
+
                 Thread.Sleep(10);
             }
         }

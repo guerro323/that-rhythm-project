@@ -4,7 +4,7 @@ using revecs.Systems.Generator;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities.Systems.Conditions;
 
-public partial struct LivingOwnerAbilityConditionSystem : IRevolutionSystem,
+/*public partial struct LivingOwnerAbilityConditionSystem : IRevolutionSystem,
     AbilityDiscardFromSelectionTag.Cmd.IAdmin
 {
     public void Constraints(in SystemObject sys)
@@ -27,4 +27,4 @@ public partial struct LivingOwnerAbilityConditionSystem : IRevolutionSystem,
             }
         }
     }
-}
+}*/

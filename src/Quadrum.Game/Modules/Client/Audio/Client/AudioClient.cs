@@ -16,7 +16,7 @@ public class AudioClient : AppSystem
     {
         scope.Context.Register(this);
         
-        Dependencies.AddRef(() => ref _world);
+        Dependencies.Add(() => ref _world);
     }
 
     protected override void OnInit()

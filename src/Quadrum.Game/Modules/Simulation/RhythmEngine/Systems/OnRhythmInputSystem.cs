@@ -1,40 +1,51 @@
+using DefaultEcs;
 using PataNext.Game.Client.Core.Inputs;
 using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.Players;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using Quadrum.Game.Utilities;
+using revecs;
 using revecs.Systems.Generator;
+using revghost;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct OnRhythmInputSystem : IRevolutionSystem,
-    GameRhythmInput.Cmd.IRead
+public partial class OnRhythmInputSystem : SimulationSystem
 {
-    public void Constraints(in SystemObject sys)
+    public OnRhythmInputSystem(Scope scope) : base(scope)
     {
-        sys.SetGroup<RhythmEngineExecutionGroup>();
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            p => p
+                .SetGroup<RhythmEngineExecutionGroup>()
+        );
     }
 
-    public void Body()
-    {
-        var time = RequiredResource<GameTime>();
+    private GameTimeQuery _timeQuery;
+    private EngineQuery _engineQuery;
+    private Commands _cmd;
 
-        foreach (var engine in RequiredQuery(
-                     Read<RhythmEngineController>("Controller"),
-                     Write<RhythmEngineState>("State"),
-                     Read<RhythmEngineSettings>("Settings"),
-                     Read<RhythmEngineCommandProgress>("Progress"),
-                     Read<RhythmEnginePredictedCommands>("Predicted"),
-                     Write<RhythmEngineRecoveryState>("Recovery"),
-                     Read<PlayerDescription.Relative>("Relative"),
-                     Write<GameCommandState>("CommandState"),
-                     All<RhythmEngineIsPlaying>()))
+    protected override void OnInit()
+    {
+        _timeQuery = new GameTimeQuery(Simulation);
+        _engineQuery = new EngineQuery(Simulation);
+        _cmd = new Commands(Simulation);
+    }
+
+    private void OnUpdate(Entity _)
+    {
+        var time = _timeQuery
+            .First()
+            .GameTime;
+        
+        foreach (var engine in _engineQuery)
         {
-            if (!Cmd.HasGameRhythmInput(engine.Relative))
+            if (!_cmd.HasGameRhythmInput(engine.Relative))
                 continue;
 
-            ref readonly var input = ref Cmd.ReadGameRhythmInput(engine.Relative);
+            ref readonly var input = ref _cmd.ReadGameRhythmInput(engine.Relative);
 
             var flowBeat = RhythmUtility.GetFlowBeat(engine.State, engine.Settings);
             // Don't accept inputs when the rhythm engine hasn't yet started
@@ -94,4 +105,17 @@ public partial struct OnRhythmInputSystem : IRevolutionSystem,
             }
         }
     }
+
+    private partial record struct EngineQuery : IQuery<(
+        Read<RhythmEngineController> Controller,
+        Write<RhythmEngineState> State,
+        Read<RhythmEngineSettings> Settings,
+        Read<RhythmEngineCommandProgress> Progress,
+        Read<RhythmEnginePredictedCommands> Predicted,
+        Write<RhythmEngineRecoveryState> Recovery,
+        Read<PlayerDescription.Relative> Relative,
+        Write<GameCommandState> CommandState,
+        All<RhythmEngineIsPlaying>)>;
+
+    private partial record struct Commands : GameRhythmInput.Cmd.IRead;
 }

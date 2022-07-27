@@ -14,6 +14,9 @@ public class Module : HostModule
 
     protected override void OnInit()
     {
-        TrackDomain((SimulationDomain domain) => { domain.SystemGroup.Add<UnitPhysicsSystem>(); });
+        TrackDomain((SimulationDomain domain) =>
+        {
+            _ = new UnitPhysicsSystem(domain.Scope);
+        });
     }
 }

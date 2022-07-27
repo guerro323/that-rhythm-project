@@ -29,10 +29,10 @@ public class SoloudServerSystem : AppSystem
     {
         SoloudObj = soloudObj;
 
-        Dependencies.AddRef(() => ref _world);
-        Dependencies.AddRef(() => ref _updateLoop);
-        Dependencies.AddRef(() => ref _worldTime);
-        Dependencies.AddRef(() => ref _domainWorker);
+        Dependencies.Add(() => ref _world);
+        Dependencies.Add(() => ref _updateLoop);
+        Dependencies.Add(() => ref _worldTime);
+        Dependencies.Add(() => ref _domainWorker);
     }
 
     private EntitySet _resourceSet;
@@ -109,15 +109,11 @@ public class SoloudServerSystem : AppSystem
         if (entity.Has<PlayAudioRequest>())
             //if (!entity.TryGet(out AudioDelayComponent delay) || worldTime.Total >= delay.Delay)
         {
-            _logger.Info("Playing for " + entity, "Event");
-
             if (entity.TryGet(out uint currSoloudId))
             {
                 if (entity.TryGet(out AudioStartTimeComponent startTime))
                 {
                     var delay = startTime.StartTime - _worldTime.Total - _domainWorker.RealtimeDelta;
-                    Console.WriteLine($"StopDelay: {delay.TotalSeconds:F3}s");
-                    
                     SoloudObj.scheduleStop(currSoloudId, delay.TotalSeconds);
                 }
                 else
@@ -137,8 +133,7 @@ public class SoloudServerSystem : AppSystem
                     rate = 44100;
 
                     var delay = startTime.StartTime - _worldTime.Total - _domainWorker.RealtimeDelta;
-                    Console.WriteLine($"Delay: {delay.TotalSeconds:F3}s");
-                    
+
                     SoloudObj.setDelaySamples(play, (uint) (rate * delay.TotalSeconds));
                     SoloudObj.setPause(play, 0);
                 }

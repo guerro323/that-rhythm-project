@@ -37,7 +37,7 @@ public partial class Box2DPhysicsEngine : AppSystem, IPhysicsEngine
 
     public Box2DPhysicsEngine(Scope scope) : base(scope)
     {
-        Dependencies.AddRef(() => ref _world);
+        Dependencies.Add(() => ref _world);
 
         Disposables.Add(cachedWorldManifold);
     }

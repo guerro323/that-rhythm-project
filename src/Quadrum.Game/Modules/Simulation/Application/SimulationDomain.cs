@@ -24,7 +24,6 @@ public class SimulationDomain : CommonDomainThreadListener
 
     public readonly World World;
     public readonly RevolutionWorld GameWorld;
-    public readonly SystemGroup SystemGroup;
     public readonly IJobRunner JobRunner;
 
     private readonly OpportunistJobRunner _jobRunner;
@@ -60,7 +59,6 @@ public class SimulationDomain : CommonDomainThreadListener
         {
             World = Scope.World;
             GameWorld = Scope.GameWorld;
-            SystemGroup = Scope.SystemGroup;
             JobRunner = Scope.JobRunner;
 
             _jobRunner = (OpportunistJobRunner) JobRunner;

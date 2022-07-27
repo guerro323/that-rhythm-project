@@ -1,31 +1,45 @@
+using DefaultEcs;
+using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Commands.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using Quadrum.Game.Utilities;
+using revecs;
 using revecs.Core;
 using revecs.Extensions.Generator.Commands;
-using revecs.Systems.Generator;
+using revghost;
 using revghost.Shared.Collections;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
-    CommandActions.Cmd.IRead, 
-    CommandDuration.Cmd.IRead, 
-    ICmdEntitySafe
+public partial class GetNextCommandEngineSystem : SimulationSystem
 {
-    public void Constraints(in SystemObject sys)
+    public GetNextCommandEngineSystem(Scope scope) : base(scope)
     {
-        sys.SetGroup<RhythmEngineExecutionGroup>();
-        {
-            sys.DependOn<OnRhythmInputSystem>();
-        }
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            p => p
+                .SetGroup<RhythmEngineExecutionGroup>()
+                .After(typeof(OnRhythmInputSystem))
+        );
     }
-    
-    public void Body()
+
+    private CommandQuery _commandQuery;
+    private EngineQuery _engineQuery;
+    private Commands _cmd;
+
+    protected override void OnInit()
+    {
+        _commandQuery = new CommandQuery(Simulation);
+        _engineQuery = new EngineQuery(Simulation);
+        _cmd = new Commands(Simulation);
+    }
+
+    private void OnUpdate(Entity _)
     {
         using var commands = new ValueList<UEntityHandle>(0);
-        foreach (var iter in RequiredQuery(All<CommandActions>()))
+        foreach (var iter in _commandQuery)
         {
             commands.Add(iter.Handle);
         }
@@ -34,19 +48,13 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
             return;
 
         using var output = new ValueList<UEntitySafe>(0);
-        foreach (var engine in RequiredQuery(
-                     Read<RhythmEngineSettings>("Settings"),
-                     Read<RhythmEngineState>("State"),
-                     Write<RhythmEngineExecutingCommand>("Executing"),
-                     Read<RhythmEngineCommandProgress>("Progress"),
-                     Write<RhythmEnginePredictedCommands>("Predicted"),
-                     All<RhythmEngineIsPlaying>()))
+        foreach (var engine in _engineQuery)
         {
             if (!engine.State.CanRunCommands)
                 continue;
 
             RhythmCommandUtility.GetCommand(
-                Cmd,
+                _cmd,
                 commands.Span, engine.Progress.Reinterpret<FlowPressure>(), in output,
                 false, engine.Settings.BeatInterval);
 
@@ -55,7 +63,7 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
             if (engine.Predicted.Count == 0)
             {
                 RhythmCommandUtility.GetCommand(
-                    Cmd,
+                    _cmd,
                     commands.Span, engine.Progress.Reinterpret<FlowPressure>(), in output,
                     true, engine.Settings.BeatInterval);
                 if (output.Count > 0)
@@ -74,7 +82,7 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
             engine.Executing.CommandTarget = output[0];
             engine.Executing.ActivationBeatStart = targetBeat;
 
-            var beatDuration = Cmd.ReadCommandDuration(engine.Executing.CommandTarget.Handle).Value;
+            var beatDuration = _cmd.ReadCommandDuration(engine.Executing.CommandTarget.Handle).Value;
 
             engine.Executing.ActivationBeatEnd = targetBeat + beatDuration;
             engine.Executing.WaitingForApply = true;
@@ -91,4 +99,19 @@ public partial struct GetNextCommandEngineSystem : IRevolutionSystem,
             engine.Progress.Clear();
         }
     }
+
+    private partial record struct CommandQuery : IQuery<All<CommandActions>>;
+
+    private partial record struct EngineQuery : IQuery<(
+        Read<RhythmEngineState> State,
+        Read<RhythmEngineSettings> Settings,
+        Read<RhythmEngineCommandProgress> Progress,
+        Write<RhythmEnginePredictedCommands> Predicted,
+        Write<RhythmEngineExecutingCommand> Executing,
+        All<RhythmEngineIsPlaying>)>;
+
+    private partial record struct Commands :
+        CommandActions.Cmd.IRead,
+        CommandDuration.Cmd.IRead,
+        ICmdEntitySafe;
 }

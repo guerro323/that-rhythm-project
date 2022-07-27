@@ -1,37 +1,43 @@
 using System;
+using DefaultEcs;
+using PataNext.Game.Client.Core.Inputs;
+using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
+using Quadrum.Game.Modules.Simulation.Players;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Commands.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using Quadrum.Game.Utilities;
+using revecs;
 using revecs.Systems.Generator;
+using revghost;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;
 
-public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
-    CommandDuration.Cmd.IRead
+public partial class ApplyCommandEngineSystem : SimulationSystem
 {
-    public void Constraints(in SystemObject sys)
+    public ApplyCommandEngineSystem(Scope scope) : base(scope)
     {
-        sys.SetGroup<RhythmEngineExecutionGroup>();
-        {
-            sys.DependOn<GetNextCommandEngineSystem>();
-        }
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            p => p
+                .SetGroup<RhythmEngineExecutionGroup>()
+                .After(typeof(GetNextCommandEngineSystem))
+        );
+    }
+    
+    private EngineQuery _engineQuery;
+    private Commands _cmd;
+
+    protected override void OnInit()
+    {
+        _engineQuery = new EngineQuery(Simulation);
+        _cmd = new Commands(Simulation);
     }
 
-    public void Body()
+    private void OnUpdate(Entity _)
     {
-        foreach (var engine in RequiredQuery(
-                     Read<RhythmEngineSettings>("Settings"),
-                     Read<RhythmEngineState>("State"),
-                     Read<RhythmEngineRecoveryState>("Recovery"),
-                     Write<RhythmEngineExecutingCommand>("Executing"),
-                     Read<RhythmEngineCommandProgress>("Progress"),
-                     Write<RhythmEnginePredictedCommands>("Predicted"),
-                     Read<GameComboSettings>("ComboSettings"),
-                     Write<GameComboState>("ComboState"),
-                     Write<GameCommandState>("CommandState"),
-                     All<RhythmEngineIsPlaying>()
-                 ))
+        foreach (var engine in _engineQuery)
         {
             if (!engine.State.CanRunCommands)
             {
@@ -51,7 +57,8 @@ public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
                     engine.Settings.BeatInterval) + cmdMercy);
             if (true) // todo: !isServer && simulateTagFromEntity.Exists(entity)
                 checkStopBeat = Math.Max(checkStopBeat,
-                    RhythmUtility.GetFlowBeat(new TimeSpan(engine.CommandState.EndTimeMs * TimeSpan.TicksPerMillisecond),
+                    RhythmUtility.GetFlowBeat(
+                        new TimeSpan(engine.CommandState.EndTimeMs * TimeSpan.TicksPerMillisecond),
                         engine.Settings.BeatInterval));
 
             var flowBeat = RhythmUtility.GetFlowBeat(engine.State, engine.Settings);
@@ -79,7 +86,7 @@ public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
                 continue;
             engine.Executing.WaitingForApply = false;
 
-            var beatDuration = Cmd.ReadCommandDuration(engine.Executing.CommandTarget.Handle).Value;
+            var beatDuration = _cmd.ReadCommandDuration(engine.Executing.CommandTarget.Handle).Value;
             /*foreach (var element in targetResourceBuffer.Span)
                 beatDuration = Math.Max(beatDuration, (int) Math.Ceiling(element.Value.Beat.Target + 1 + element.Value.Beat.Offset + element.Value.Beat.SliderLength));*/
 
@@ -87,11 +94,14 @@ public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
             if (true)
             {
                 engine.CommandState.ChainEndTimeMs = (int) ((rhythmActiveAtFlowBeat + beatDuration + 4) *
-                                                     (engine.Settings.BeatInterval.Ticks / TimeSpan.TicksPerMillisecond));
+                                                            (engine.Settings.BeatInterval.Ticks /
+                                                             TimeSpan.TicksPerMillisecond));
                 engine.CommandState.StartTimeMs = (int) (engine.Executing.ActivationBeatStart *
-                                                         (engine.Settings.BeatInterval.Ticks / TimeSpan.TicksPerMillisecond));
+                                                         (engine.Settings.BeatInterval.Ticks /
+                                                          TimeSpan.TicksPerMillisecond));
                 engine.CommandState.EndTimeMs = (int) (engine.Executing.ActivationBeatEnd *
-                                                       (engine.Settings.BeatInterval.Ticks / TimeSpan.TicksPerMillisecond));
+                                                       (engine.Settings.BeatInterval.Ticks /
+                                                        TimeSpan.TicksPerMillisecond));
 
                 var wasFever = engine.ComboSettings.CanEnterFever(engine.ComboState);
 
@@ -108,4 +118,18 @@ public partial struct ApplyCommandEngineSystem : IRevolutionSystem,
             }
         }
     }
+
+    private partial record struct EngineQuery : IQuery<(
+        Read<RhythmEngineState> State,
+        Read<RhythmEngineSettings> Settings,
+        Read<RhythmEngineCommandProgress> Progress,
+        Read<RhythmEnginePredictedCommands> Predicted,
+        Write<RhythmEngineExecutingCommand> Executing,
+        Read<RhythmEngineRecoveryState> Recovery,
+        Write<GameCommandState> CommandState,
+        Read<GameComboSettings> ComboSettings,
+        Write<GameComboState> ComboState,
+        All<RhythmEngineIsPlaying>)>;
+
+    private partial record struct Commands : CommandDuration.Cmd.IRead;
 }

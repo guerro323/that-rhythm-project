@@ -1,39 +1,27 @@
 using Quadrum.Game.Utilities;
 using revecs.Systems.Generator;
+using revghost;
+using revghost.Ecs;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities;
 
 // Update in AbilitySystemGroup
-public partial class AbilityExecutionSystemGroup : ISystemGroup
+public partial class AbilityExecutionSystemGroup : BaseSystemGroup<AbilityExecutionSystemGroup>
 {
-    public partial struct Begin : IRevolutionSystem
+    public AbilityExecutionSystemGroup(Scope scope) : base(scope)
     {
-        public void Constraints(in SystemObject sys)
-        {
-            sys.DependOn<AbilitySystemGroup.Begin>();
-        }
-
-        public void Body()
-        {
-        }
     }
 
-    public partial struct End : IRevolutionSystem
+    protected override void SetBegin(OrderBuilder builder)
     {
-        public void Constraints(in SystemObject sys)
-        {
-            sys.DependOn<Begin>();
-            sys.AddForeignDependency<AbilitySystemGroup.End>();
-        }
-
-        public void Body()
-        {
-        }
+        base.SetBegin(builder);
+        builder.SetGroup<AbilitySystemGroup>();
+        builder.AfterGroup<AbilityConditionSystemGroup>();
     }
 
-    public static void AddToGroup(SystemObject systemObject)
+    protected override void SetEnd(OrderBuilder builder)
     {
-        systemObject.DependOn<Begin>();
-        systemObject.AddForeignDependency<End>();
+        base.SetEnd(builder);
+        builder.SetGroup<AbilitySystemGroup>();
     }
 }

@@ -1,51 +1,51 @@
+using DefaultEcs;
 using GameHost.Native.Fixed;
 using Quadrum.Game.Modules.Simulation.Abilities.Components;
+using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using Quadrum.Game.Utilities;
+using revecs;
 using revecs.Core;
 using revecs.Systems.Generator;
+using revghost;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities.Systems;
 
-public partial struct UpdateActiveAbilitySystem : IRevolutionSystem,
-    RhythmEngineState.Cmd.IRead,
-    RhythmEngineSettings.Cmd.IRead,
-    RhythmEngineExecutingCommand.Cmd.IRead,
-    GameComboState.Cmd.IRead,
-    GameComboSettings.Cmd.IRead,
-    GameCommandState.Cmd.IRead,
-    
-    AbilityStateBeforeActivationTag.Cmd.IAdmin,
-    AbilityStateActiveTag.Cmd.IAdmin,
-    AbilityStateChainingTag.Cmd.IAdmin,
-    
-    AbilityRhythmEngineSet.Cmd.IAdmin
+public partial class UpdateActiveAbilitySystem : SimulationSystem
 {
-    public void Constraints(in SystemObject sys)
+    public UpdateActiveAbilitySystem(Scope scope) : base(scope)
     {
-        sys.SetGroup<AbilitySystemGroup>();
-        // Update after all conditions were updated
-        sys.DependOn<AbilityConditionSystemGroup.End>();
-        // Update before abilities are updated
-        sys.AddForeignDependency<AbilityExecutionSystemGroup.Begin>();
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            b => b
+                .SetGroup<AbilitySystemGroup>()
+                // Update after all conditions were updated
+                .AfterGroup<AbilityConditionSystemGroup>()
+                // Update before abilities are executed
+                .BeforeGroup<AbilityExecutionSystemGroup>()
+        );
     }
 
-    public void Body()
-    {
-        foreach (var entity in RequiredQuery(
-                     Read<AbilityOwnerDescription>("abilityBuffer"),
-                     Write<OwnerActiveAbility>("active"),
+    private Commands _cmd;
+    private OwnerQuery _ownerQuery;
 
-                     Read<RhythmEngineDescription.Relative>("rhythmRelative")
-                 ))
+    protected override void OnInit()
+    {
+        _cmd = new Commands(Simulation);
+    }
+
+    private void OnUpdate(Entity _)
+    {
+        foreach (var entity in _ownerQuery)
         {
-            ref readonly var engineState = ref Cmd.ReadRhythmEngineState(entity.rhythmRelative);
-            ref readonly var engineSettings = ref Cmd.ReadRhythmEngineSettings(entity.rhythmRelative);
-            ref readonly var executingCommand = ref Cmd.ReadRhythmEngineExecutingCommand(entity.rhythmRelative);
-            ref readonly var comboState = ref Cmd.ReadGameComboState(entity.rhythmRelative);
-            ref readonly var comboSettings = ref Cmd.ReadGameComboSettings(entity.rhythmRelative);
-            ref readonly var commandState = ref Cmd.ReadGameCommandState(entity.rhythmRelative);
+            ref readonly var engineState = ref _cmd.ReadRhythmEngineState(entity.rhythmRelative);
+            ref readonly var engineSettings = ref _cmd.ReadRhythmEngineSettings(entity.rhythmRelative);
+            ref readonly var executingCommand = ref _cmd.ReadRhythmEngineExecutingCommand(entity.rhythmRelative);
+            ref readonly var comboState = ref _cmd.ReadGameComboState(entity.rhythmRelative);
+            ref readonly var comboSettings = ref _cmd.ReadGameComboSettings(entity.rhythmRelative);
+            ref readonly var commandState = ref _cmd.ReadGameCommandState(entity.rhythmRelative);
 
             var isSimulationOwned = true;
             var isRhythmEngineOwned = true;
@@ -72,11 +72,11 @@ public partial struct UpdateActiveAbilitySystem : IRevolutionSystem,
 
                 foreach (var abilityHandle in entity.abilityBuffer)
                 {
-                    Cmd.RemoveAbilityStateActiveTag(abilityHandle);
-                    Cmd.RemoveAbilityStateChainingTag(abilityHandle);
-                    Cmd.RemoveAbilityStateBeforeActivationTag(abilityHandle);
+                    _cmd.RemoveAbilityStateActiveTag(abilityHandle);
+                    _cmd.RemoveAbilityStateChainingTag(abilityHandle);
+                    _cmd.RemoveAbilityStateBeforeActivationTag(abilityHandle);
 
-                    Cmd.UpdateAbilityRhythmEngineSet(abilityHandle) = new AbilityRhythmEngineSet
+                    _cmd.UpdateAbilityRhythmEngineSet(abilityHandle) = new AbilityRhythmEngineSet
                     {
                         Engine = entity.rhythmRelative,
                         State = engineState,
@@ -92,7 +92,7 @@ public partial struct UpdateActiveAbilitySystem : IRevolutionSystem,
             }
         }
     }
-
+    
     private static bool updateAndCheckNewIncomingCommand(in GameComboState gameCombo, in GameCommandState commandState,
         in RhythmEngineExecutingCommand executingCommand,
         ref OwnerActiveAbility activeSelf)
@@ -114,4 +114,24 @@ public partial struct UpdateActiveAbilitySystem : IRevolutionSystem,
         return true;
 
     }
+    
+    private partial record struct OwnerQuery : IQuery<(
+        Read<AbilityOwnerDescription> abilityBuffer,
+        Write<OwnerActiveAbility> active,
+        
+        Read<RhythmEngineDescription.Relative> rhythmRelative)>;
+
+    private partial record struct Commands :
+        RhythmEngineState.Cmd.IRead,
+        RhythmEngineSettings.Cmd.IRead,
+        RhythmEngineExecutingCommand.Cmd.IRead,
+        GameComboState.Cmd.IRead,
+        GameComboSettings.Cmd.IRead,
+        GameCommandState.Cmd.IRead,
+
+        AbilityStateBeforeActivationTag.Cmd.IAdmin,
+        AbilityStateActiveTag.Cmd.IAdmin,
+        AbilityStateChainingTag.Cmd.IAdmin,
+
+        AbilityRhythmEngineSet.Cmd.IAdmin;
 }
