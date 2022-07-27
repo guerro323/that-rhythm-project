@@ -27,13 +27,13 @@
 
     <ItemGroup>
         <PackageReference Include="DNNE" Version="1.0.32" />
+        <PackageReference Include="GodotCLR" Version="0.0.0-local" />
         <PackageReference Include="revghost" Version="0.0.0-local" />
         <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Quadrum.Game\Quadrum.Game.csproj" />
-      <ProjectReference Include="/media/guerro/FastBoi/Projets/GodotCLR/GodotCLR.csproj" />
     </ItemGroup>
 
     <ItemGroup>
