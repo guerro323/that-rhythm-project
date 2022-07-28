@@ -15,7 +15,7 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <!--<EnableDynamicLoading>true</EnableDynamicLoading>-->
         <!--<DnneAddGeneratedBinaryToProject>true</DnneAddGeneratedBinaryToProject>
         <DnneCompilerUserFlags Condition="'$(BuildAsCPPWithMSVC)'=='true'">/TP </DnneCompilerUserFlags>
         <DnneCompilerCommand Condition="'$(BuildWithGCC)'=='true'">gcc</DnneCompilerCommand>
@@ -26,7 +26,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DNNE" Version="1.0.32" />
         <PackageReference Include="GodotCLR" Version="0.0.0-local" />
         <PackageReference Include="revghost" Version="0.0.0-local" />
         <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
