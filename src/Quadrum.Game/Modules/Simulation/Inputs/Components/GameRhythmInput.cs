@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using Quadrum.Game.Utilities;
 using revecs.Extensions.Buffers;
 using revecs.Extensions.Generator.Components;
 
@@ -34,5 +35,5 @@ public partial struct GameRhythmInput : ISparseComponent
     /// [2] is Down
     /// [3] is Up
     /// </remarks>
-    public Span<RhythmAction> Actions => MemoryMarshal.CreateSpan(ref action0, 4);
+    public unsafe Span<RhythmAction> Actions => MemoryMarshal.CreateSpan(ref action0.Ptr()->Ref(), 4);
 }

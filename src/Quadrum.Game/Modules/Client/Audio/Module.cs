@@ -34,6 +34,7 @@ public class Module : HostModule
         {
             _ = new LoadIncomingAudioSystem(domain.Scope);
             _ = new AudioClient(domain.Scope);
+            _ = new AudioSystemGroup(domain.Scope);
         });
     }
 }

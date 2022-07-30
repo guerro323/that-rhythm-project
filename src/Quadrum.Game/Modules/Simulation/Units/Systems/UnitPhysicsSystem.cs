@@ -7,12 +7,8 @@ using Quadrum.Game.Modules.Simulation.Common.Transform;
 using Quadrum.Game.Modules.Simulation.Cursors;
 using Quadrum.Game.Utilities;
 using revecs;
-using revecs.Extensions.Generator.Commands;
-using revecs.Systems.Generator;
 using revghost;
 using revghost.Domains.Time;
-using revghost.Ecs;
-using revghost.Injection;
 using revghost.Loop.EventSubscriber;
 using revghost.Utility;
 
@@ -22,9 +18,10 @@ public partial class UnitPhysicsSystem : SimulationSystem
 {
     public UnitPhysicsSystem(Scope scope) : base(scope)
     {
-        SubscribeTo<IDomainUpdateLoopSubscriber>(OnUpdate);
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(OnUpdate);
     }
 
+    private GameTimeQuery _timeQuery;
     private UnitQuery _query;
     private Commands _cmd;
 
@@ -35,12 +32,13 @@ public partial class UnitPhysicsSystem : SimulationSystem
             (_query = new UnitQuery(Simulation)).Query
         });
 
+        _timeQuery = new GameTimeQuery(Simulation);
         _cmd = new Commands(Simulation);
     }
 
     private void OnUpdate(Entity entity)
     {
-        var time = entity.Get<WorldTime>();
+        var delta = (float) _timeQuery.First().GameTime.Delta.TotalSeconds;
         
         _query.QueueAndComplete(Runner, static (state, entities) =>
         {
@@ -53,11 +51,13 @@ public partial class UnitPhysicsSystem : SimulationSystem
                     unit.groundState.Value = false;
 
                 var previousPosition = unit.pos.Value;
-                var target = unit.controller.OverrideTargetPosition || cmd.HasCursorDescriptionRelative(unit.Handle)
+                // If the entity override its target position we take it.
+                // Else if the entity has a cursor relative we take its position, alongside with its offset
+                var target = unit.controller.OverrideTargetPosition || !cmd.HasCursorDescriptionRelative(unit.Handle)
                     ? unit.controller.TargetPosition
                     : cmd.ReadPositionComponent(cmd.ReadCursorDescriptionRelative(unit.Handle)).Value.X
                       + (cmd.HasCursorOffset(unit.Handle)
-                          ? cmd.ReadCursorOffset(unit.Handle).Value
+                          ? cmd.ReadCursorOffset(unit.Handle).Idle
                           : 0f);
 
                 if (!unit.controller.ControlOverVelocityX)
@@ -90,16 +90,19 @@ public partial class UnitPhysicsSystem : SimulationSystem
 
                 if (!unit.controller.ControlOverVelocityY)
                     if (!unit.groundState.Value)
-                        unit.vel.Value += gravity * dt;
+                        unit.vel.Y += gravity.Y * dt;
 
                 foreach (ref var axe in unit.vel.Value.AsSpan())
                 {
                     axe = float.IsNaN(axe) ? 0 : axe;
                 }
 
+                //Console.WriteLine($"{unit.vel.Value:F3} {unit.vel.Value * dt:F3}");
                 unit.pos.Value += unit.vel.Value * dt;
                 // todo: proper floor support? (use collision objects?)
                 unit.pos.Value.Y = Math.Max(0, unit.pos.Value.Y);
+                
+                unit.groundState.Value = unit.pos.Value.Y <= 0;
 
                 if (!unit.controller.ControlOverVelocityY && unit.groundState.Value)
                     unit.vel.Y = Math.Max(0, unit.vel.Y);
@@ -114,7 +117,7 @@ public partial class UnitPhysicsSystem : SimulationSystem
                 unit.controller.PassThroughEnemies = false; // TODO: set it to true once we add LivableIsDead
                 unit.controller.PreviousPosition = previousPosition;
             }
-        }, ((float) time.Delta.TotalSeconds, _cmd));
+        }, (delta, _cmd));
     }
 
     public partial record struct UnitQuery : IQuery<(

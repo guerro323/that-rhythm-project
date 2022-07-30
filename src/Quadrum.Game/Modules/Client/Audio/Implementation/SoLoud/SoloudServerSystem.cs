@@ -2,6 +2,8 @@ using System;
 using DefaultEcs;
 using GameHost.Audio.Players;
 using Quadrum.Game.Modules.Client.Audio;
+using Quadrum.Game.Modules.Simulation.Application;
+using Quadrum.Game.Utilities;
 using revghost;
 using revghost.Domains.Time;
 using revghost.Ecs;
@@ -44,7 +46,7 @@ public class SoloudServerSystem : AppSystem
     {
         Disposables.AddRange(new[]
         {
-            _updateLoop.Subscribe(OnUpdate)
+            _updateLoop.Subscribe(OnUpdate, b => b.SetGroup<AudioSystemGroup>())
                 .IntendedBox(),
 
             (
@@ -114,6 +116,9 @@ public class SoloudServerSystem : AppSystem
                 if (entity.TryGet(out AudioStartTimeComponent startTime))
                 {
                     var delay = startTime.StartTime - _worldTime.Total - _domainWorker.RealtimeDelta;
+                    if (delay < TimeSpan.Zero)
+                        delay = TimeSpan.Zero;
+                    
                     SoloudObj.scheduleStop(currSoloudId, delay.TotalSeconds);
                 }
                 else
@@ -133,6 +138,8 @@ public class SoloudServerSystem : AppSystem
                     rate = 44100;
 
                     var delay = startTime.StartTime - _worldTime.Total - _domainWorker.RealtimeDelta;
+                    if (delay < TimeSpan.Zero)
+                        delay = TimeSpan.Zero;
 
                     SoloudObj.setDelaySamples(play, (uint) (rate * delay.TotalSeconds));
                     SoloudObj.setPause(play, 0);

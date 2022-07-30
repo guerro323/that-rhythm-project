@@ -10,8 +10,8 @@ public partial struct AbilityLayout : IEntityLayoutComponent
         componentTypes.AddRange(new[]
         {
             AbilityState.ToComponentType(world),
-            AbilityRhythmEngineSet.ToComponentType(world),
-            AbilityOwnerDescription.Relative.ToComponentType(world)
+            AbilityPriority.ToComponentType(world),
+            AbilityRhythmEngineSet.ToComponentType(world)
         });
     }
 }

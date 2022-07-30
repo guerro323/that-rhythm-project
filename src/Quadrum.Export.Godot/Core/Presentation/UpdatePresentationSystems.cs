@@ -35,7 +35,7 @@ public class UpdatePresentationSystems : AppSystem
         Disposables.AddRange(new IDisposable[]
         {
             loop,
-            domainUpdate.Subscribe(OnUpdate, b => { b.After(typeof(RunSimulationUpdateLoopSystem)); })
+            domainUpdate.Subscribe(OnUpdate)
         });
     }
 

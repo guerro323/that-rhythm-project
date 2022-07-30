@@ -34,6 +34,9 @@ public class SimulationDomain : CommonDomainThreadListener
     public readonly IDomainUpdateLoopSubscriber UpdateLoop;
     private readonly DefaultDomainUpdateLoopSubscriber _updateLoop;
 
+    public readonly ISimulationUpdateLoopSubscriber SimulationLoop;
+    private readonly SimulationUpdateLoop _simulationLoop;
+
     private readonly Stopwatch _sleepTime = new();
     private readonly DomainWorker _worker;
 
@@ -65,6 +68,7 @@ public class SimulationDomain : CommonDomainThreadListener
 
             Scope.Context.Register(WorldTime = _worldTime = new ManagedWorldTime());
             Scope.Context.Register(UpdateLoop = _updateLoop = new DefaultDomainUpdateLoopSubscriber(World));
+            Scope.Context.Register(SimulationLoop = _simulationLoop = new SimulationUpdateLoop(World));
             Scope.Context.Register<IReadOnlyDomainWorker>(_worker);
         }
 
@@ -74,8 +78,14 @@ public class SimulationDomain : CommonDomainThreadListener
         GameWorld.AddComponent(_timeEntity, GameTime.Type.GetOrCreate(GameWorld), default);
     }
 
+    private JobRequest _previousLoopJob;
+    
+    public JobRequest CurrentJob => _previousLoopJob;
+
     protected override void DomainUpdate()
     {
+        _jobRunner.CompleteBatch(_previousLoopJob, false);
+
         // future proof for a rollback system
         _worldTime.Total = _currentFrame * _worldTime.Delta;
         {
@@ -85,8 +95,47 @@ public class SimulationDomain : CommonDomainThreadListener
                 Total = _worldTime.Total,
                 Delta = _worldTime.Delta
             };
-            
-            _updateLoop.Invoke(_worldTime.Total, _worldTime.Delta);
+
+            _jobRunner.StartPerformanceCriticalSection();
+            try
+            {
+                _updateLoop.Invoke(_worldTime.Total, _worldTime.Delta);
+            }
+            finally
+            {
+                _jobRunner.StopPerformanceCriticalSection();
+            }
+        }
+
+        _worldTime.Total += _worldTime.Delta;
+        GameWorld.GetComponentData(_timeEntity, GameTime.Type.GetOrCreate(GameWorld)) = new GameTime
+        {
+            Frame = _currentFrame + 1,
+            Total = _worldTime.Total,
+            Delta = _worldTime.Delta
+        };
+        
+        _previousLoopJob = _jobRunner.Queue(new JobExecuteLoop(_simulationLoop));
+    }
+
+    private readonly record struct JobExecuteLoop(SimulationUpdateLoop Loop) : IJob
+    {
+        public int SetupJob(JobSetupInfo info)
+        {
+            return 1;
+        }
+
+        public void Execute(IJobRunner runner, JobExecuteInfo info)
+        {
+            ((OpportunistJobRunner) runner).StartPerformanceCriticalSection();
+            try
+            {
+                Loop.Invoke();
+            }
+            finally
+            {
+                ((OpportunistJobRunner) runner).StopPerformanceCriticalSection();
+            }
         }
     }
 
@@ -115,22 +164,14 @@ public class SimulationDomain : CommonDomainThreadListener
                 Scheduler.Run();
                 TryExecuteScheduler();
 
-                try
+                for (var tickAge = updateCount - 1; tickAge >= 0; --tickAge)
                 {
-                    _jobRunner.StartPerformanceCriticalSection();
-                    for (var tickAge = updateCount - 1; tickAge >= 0; --tickAge)
-                    {
-                        _currentFrame++;
-                        DomainUpdate();
-                    }
-                }
-                finally
-                {
-                    _jobRunner.StopPerformanceCriticalSection();
+                    _currentFrame++;
+                    DomainUpdate();
                 }
             }
         }
-        
+
         var timeToSleep =
             TimeSpan.FromTicks(
                 Math.Max(

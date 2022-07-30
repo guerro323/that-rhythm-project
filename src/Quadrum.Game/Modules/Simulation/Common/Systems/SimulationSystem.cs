@@ -2,6 +2,7 @@ using System;
 using DefaultEcs;
 using revecs.Core;
 using revecs.Querying;
+using revecs.Systems;
 using revghost;
 using revghost.Ecs;
 using revghost.Injection;
@@ -84,5 +85,12 @@ public abstract class SimulationSystem : AppSystem
     public void SynchronizeArchetypes()
     {
         Simulation.ArchetypeUpdateBoard.Update();
+    }
+
+    public void Parallel<T>(ArchetypeQuery query, ArchetypeJob<T>.OnArchetype onArchetype, T arg)
+    {
+        var job = new ArchetypeJob<T>(onArchetype, query);
+        job.PrepareData(arg);
+        Runner.QueueAndComplete(job);
     }
 }

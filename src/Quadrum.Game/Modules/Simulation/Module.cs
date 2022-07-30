@@ -36,13 +36,5 @@ public partial class Module : HostModule
             
             _world.Set(new CurrentSimulationClient(domain));
         }
-        
-        TrackDomain((SimulationDomain domain) =>
-        {
-            Disposables.AddRange(new IDisposable[]
-            {
-                new RunSimulationUpdateLoopSystem(domain.Scope)
-            });
-        });
     }
 }
