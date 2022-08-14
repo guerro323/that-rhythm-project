@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using DefaultEcs;
 using revecs.Core;
+using revecs.Core.Boards;
 using revecs.Systems;
 using revghost;
 using revghost.Domains;
@@ -70,6 +71,8 @@ public class SimulationDomain : CommonDomainThreadListener
             Scope.Context.Register(UpdateLoop = _updateLoop = new DefaultDomainUpdateLoopSubscriber(World));
             Scope.Context.Register(SimulationLoop = _simulationLoop = new SimulationUpdateLoop(World));
             Scope.Context.Register<IReadOnlyDomainWorker>(_worker);
+            
+            // GameWorld.AddBoard(nameof(BatchRunnerBoard), new BatchRunnerBoard(_jobRunner, GameWorld));
         }
 
         _targetFrequency = TimeSpan.FromMilliseconds(10);
@@ -127,6 +130,8 @@ public class SimulationDomain : CommonDomainThreadListener
 
         public void Execute(IJobRunner runner, JobExecuteInfo info)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             ((OpportunistJobRunner) runner).StartPerformanceCriticalSection();
             try
             {
@@ -136,6 +141,8 @@ public class SimulationDomain : CommonDomainThreadListener
             {
                 ((OpportunistJobRunner) runner).StopPerformanceCriticalSection();
             }
+            sw.Stop();
+            Console.WriteLine($"Frame={sw.Elapsed.TotalMilliseconds:F3}ms");
         }
     }
 

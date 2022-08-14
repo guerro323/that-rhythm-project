@@ -66,7 +66,7 @@ public partial class UnitPhysicsSystem : SimulationSystem
                     {
                         var ps = unit.playState with
                         {
-                            MovementSpeed = unit.playState.MovementReturnSpeed
+                            MovementAttackSpeed = unit.playState.MovementReturnSpeed
                         };
 
                         unit.vel.X = AbilityUtility.GetTargetVelocityX(new AbilityUtility.GetTargetVelocityParameters

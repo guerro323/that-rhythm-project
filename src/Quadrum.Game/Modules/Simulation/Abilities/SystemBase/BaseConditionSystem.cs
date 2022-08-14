@@ -38,21 +38,22 @@ public abstract partial class BaseConditionSystem : SimulationSystem
 
     private void OnUpdate(Entity _)
     {
-        Parallel(_query, (in ReadOnlySpan<UEntityHandle> entities, in SystemState<Commands> state) =>
+        Parallel(_query, static (in ReadOnlySpan<UEntityHandle> entities, in SystemState<BaseConditionSystem> state) =>
         {
+            var inst = state.Data;
             foreach (var entity in entities)
             {
-                var flag = CanExecuteAbility(entity);
+                var flag = inst.CanExecuteAbility(entity);
                 if (!flag)
                 {
-                    _cmd.AddAbilityDiscardFromSelectionTag(entity);
+                    inst._cmd.AddAbilityDiscardFromSelectionTag(entity);
                 }
                 else
                 {
-                    _cmd.RemoveAbilityDiscardFromSelectionTag(entity);
+                    inst._cmd.RemoveAbilityDiscardFromSelectionTag(entity);
                 }
             }
-        }, _cmd);
+        }, this);
     }
 
     protected abstract void GetComponentTypes<TList>(TList componentTypes) where TList : IList<ComponentType>;

@@ -43,16 +43,29 @@ public partial class PrepareAbilitySystem : SimulationSystem
         _ownerQuery.QueueAndComplete(Runner, (state, entities) =>
         {
             var cmd = state.Data;
+
+            /*var rhythmRelativeAccessor = state.World.AccessEntityComponent(RhythmEngineDescription.Relative.Type.GetOrCreate(state.World));
+            var activeAccessor = state.World.AccessSparseSet(OwnerActiveAbility.Type.GetOrCreate(state.World));
+            var abilityBufferAccessor = state.World.AccessEntityComponent(AbilityOwnerDescription.Type.GetOrCreate(state.World));*/
+            //while (entities._enumerator.MoveNext())
             foreach (var entity in entities)
             {
-                ref readonly var engineState = ref cmd.ReadRhythmEngineState(entity.rhythmRelative);
-                ref readonly var engineSettings = ref cmd.ReadRhythmEngineSettings(entity.rhythmRelative);
-                ref readonly var executingCommand = ref cmd.ReadRhythmEngineExecutingCommand(entity.rhythmRelative);
-                ref readonly var comboState = ref cmd.ReadGameComboState(entity.rhythmRelative);
-                ref readonly var comboSettings = ref cmd.ReadGameComboSettings(entity.rhythmRelative);
-                ref readonly var commandState = ref cmd.ReadGameCommandState(entity.rhythmRelative);
+                /*var entity = entities._enumerator.Current;
+                ref readonly var rhythmRelative = ref rhythmRelativeAccessor[entity][0];
+                ref var active = ref activeAccessor[entity];
+                var abilityBuffer = abilityBufferAccessor[entity];*/
+                var rhythmRelative = entity.rhythmRelative;
+                ref var active = ref entity.active;
+                var abilityBuffer = entity.abilityBuffer;
 
-                UpdateCombo(comboState, commandState, executingCommand, ref entity.active);
+                ref readonly var engineState = ref cmd.ReadRhythmEngineState(rhythmRelative);
+                ref readonly var engineSettings = ref cmd.ReadRhythmEngineSettings(rhythmRelative);
+                ref readonly var executingCommand = ref cmd.ReadRhythmEngineExecutingCommand(rhythmRelative);
+                ref readonly var comboState = ref cmd.ReadGameComboState(rhythmRelative);
+                ref readonly var comboSettings = ref cmd.ReadGameComboSettings(rhythmRelative);
+                ref readonly var commandState = ref cmd.ReadGameCommandState(rhythmRelative);
+
+                UpdateCombo(comboState, commandState, executingCommand, ref active);
 
                 {
                     var previousCommand = default(UEntityHandle);
@@ -63,15 +76,15 @@ public partial class PrepareAbilitySystem : SimulationSystem
                         offset += 1;
                     }
 
-                    var cmdIdx = entity.active.Combo.GetLength() - 1 - offset;
-                    if (cmdIdx >= 0 && entity.active.Combo.GetLength() >= cmdIdx + 1)
-                        previousCommand = entity.active.Combo.Span[cmdIdx];
+                    var cmdIdx = active.Combo.GetLength() - 1 - offset;
+                    if (cmdIdx >= 0 && active.Combo.GetLength() >= cmdIdx + 1)
+                        previousCommand = active.Combo.Span[cmdIdx];
 
-                    foreach (var abilityHandle in entity.abilityBuffer)
+                    foreach (var abilityHandle in abilityBuffer)
                     {
                         cmd.UpdateAbilityRhythmEngineSet(abilityHandle) = new AbilityRhythmEngineSet
                         {
-                            Engine = entity.rhythmRelative,
+                            Engine = rhythmRelative,
                             State = engineState,
                             Settings = engineSettings,
                             Executing = executingCommand,

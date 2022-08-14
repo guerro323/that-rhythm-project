@@ -98,10 +98,7 @@ public partial class MarchAbilityAspectSystem : SimulationSystem
                     direction = Math.Sign(cursorPosition + cursorOffset - ownerPosition);
 
                     velocity.X = LerpNormalized(velocity.X, walkSpeed * direction, acceleration);
-
-                    //Console.WriteLine($"direction: {cursorPosition} + {cursorOffset} - {ownerPosition}");
-                    //Console.WriteLine($"velocity: {velocity.Value:F3}, {walkSpeed} * {direction}, {acceleration}");
-
+                    
                     ref var controllerState = ref cmd.UpdateUnitControllerState(owner);
                     controllerState.ControlOverVelocityX = true;
                 }
