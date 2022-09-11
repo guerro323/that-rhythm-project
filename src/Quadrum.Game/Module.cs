@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Quadrum.Game.BGM;
 using revghost;
 using revghost.Module;
@@ -21,6 +22,8 @@ public class Module : HostModule
             LoadModule(scope => new Modules.Simulation.RhythmEngine.Module(scope));
             LoadModule(scope => new Modules.Simulation.Units.Module(scope));
             LoadModule(scope => new Modules.Simulation.Abilities.Module(scope));
+
+            LoadModule(scope => new Modules.Simulation.Interaction.Module(scope));
         }
         
         LoadModule(scope => new Modules.Client.Audio.Module(scope));
