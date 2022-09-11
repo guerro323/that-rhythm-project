@@ -111,17 +111,19 @@ public class SimulationDomain : CommonDomainThreadListener
         }
 
         _worldTime.Total += _worldTime.Delta;
-        GameWorld.GetComponentData(_timeEntity, GameTime.Type.GetOrCreate(GameWorld)) = new GameTime
+        
+        ref var gameTime = ref GameWorld.GetComponentData(_timeEntity, GameTime.Type.GetOrCreate(GameWorld));
+        gameTime = new GameTime
         {
             Frame = _currentFrame + 1,
             Total = _worldTime.Total,
             Delta = _worldTime.Delta
         };
         
-        _previousLoopJob = _jobRunner.Queue(new JobExecuteLoop(_simulationLoop));
+        _previousLoopJob = _jobRunner.Queue(new JobExecuteLoop(_simulationLoop, gameTime));
     }
 
-    private readonly record struct JobExecuteLoop(SimulationUpdateLoop Loop) : IJob
+    private readonly record struct JobExecuteLoop(SimulationUpdateLoop Loop, GameTime GameTime) : IJob
     {
         public int SetupJob(JobSetupInfo info)
         {
@@ -135,7 +137,7 @@ public class SimulationDomain : CommonDomainThreadListener
             ((OpportunistJobRunner) runner).StartPerformanceCriticalSection();
             try
             {
-                Loop.Invoke();
+                Loop.Invoke(GameTime);
             }
             finally
             {

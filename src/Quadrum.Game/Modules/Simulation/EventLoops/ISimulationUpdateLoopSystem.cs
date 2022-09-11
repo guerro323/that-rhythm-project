@@ -48,8 +48,10 @@ public class SimulationUpdateLoop : ISimulationUpdateLoopSubscriber,
         return entity;
     }
 
-    public void Invoke()
+    public void Invoke(GameTime gameTime)
     {
+        _callbackEntity.Set(gameTime);
+        
         if (_orderGroup.Build())
         {
             _callbacks.ClearReference();

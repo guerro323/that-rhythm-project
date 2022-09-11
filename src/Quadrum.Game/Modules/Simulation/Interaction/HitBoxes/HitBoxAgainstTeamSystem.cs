@@ -19,6 +19,7 @@ using revghost;
 using revghost.Domains.Time;
 using revghost.Shared.Threading.Schedulers;
 using revghost.Threading;
+using LivableIsDead = Quadrum.Game.Modules.Simulation.Interaction.Health.Components.LivableIsDead;
 
 namespace Quadrum.Game.Modules.Simulation.Interaction.HitBoxes;
 
