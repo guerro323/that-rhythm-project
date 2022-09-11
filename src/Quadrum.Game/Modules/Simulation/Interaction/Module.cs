@@ -11,6 +11,8 @@ public class Module : HostModule
 
     protected override void OnInit()
     {
+        LoadModule(sc => new Health.Module(sc));
         LoadModule(sc => new HitBoxes.Module(sc));
+        LoadModule(sc => new Damage.Module(sc));
     }
 }
