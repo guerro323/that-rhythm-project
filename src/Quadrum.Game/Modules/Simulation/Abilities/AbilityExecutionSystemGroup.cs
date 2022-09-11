@@ -1,5 +1,4 @@
 using Quadrum.Game.Utilities;
-using revecs.Systems.Generator;
 using revghost;
 using revghost.Ecs;
 

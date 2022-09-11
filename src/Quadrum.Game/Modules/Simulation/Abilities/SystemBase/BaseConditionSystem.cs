@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using Collections.Pooled;
 using DefaultEcs;
 using Quadrum.Game.Modules.Simulation.Abilities.Components;

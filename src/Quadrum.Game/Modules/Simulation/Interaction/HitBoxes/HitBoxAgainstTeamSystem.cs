@@ -1,25 +1,21 @@
 using System;
-using System.Runtime;
 using System.Numerics;
 using DefaultEcs;
-using Quadrum.Game.Modules.Simulation.Abilities.Components.Conditions;
 using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.Common.Physics;
 using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Modules.Simulation.Common.Transform;
-using Quadrum.Game.Modules.Simulation.Interaction.Health;
+using Quadrum.Game.Modules.Simulation.Interaction.Health.Components;
 using Quadrum.Game.Modules.Simulation.Teams;
 using revecs;
 using revecs.Core;
 using revecs.Extensions.Buffers;
 using revecs.Extensions.Generator.Commands;
 using revecs.Extensions.Generator.Components;
-using revecs.Systems;
 using revghost;
 using revghost.Domains.Time;
 using revghost.Shared.Threading.Schedulers;
 using revghost.Threading;
-using LivableIsDead = Quadrum.Game.Modules.Simulation.Interaction.Health.Components.LivableIsDead;
 
 namespace Quadrum.Game.Modules.Simulation.Interaction.HitBoxes;
 

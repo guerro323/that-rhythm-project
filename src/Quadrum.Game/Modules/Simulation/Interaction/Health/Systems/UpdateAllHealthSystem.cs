@@ -6,7 +6,6 @@ using Quadrum.Game.Modules.Simulation.Interaction.Health.EventLoops;
 using revecs;
 using revecs.Extensions.Buffers;
 using revghost;
-using revghost.Ecs;
 using revghost.Utility;
 
 namespace Quadrum.Game.Modules.Simulation.Interaction.Health.Systems;

@@ -3,7 +3,6 @@ using Quadrum.Game.Modules.Simulation.Abilities.Systems;
 using Quadrum.Game.Modules.Simulation.Abilities.Systems.Aspects;
 using Quadrum.Game.Modules.Simulation.Abilities.Systems.Conditions;
 using Quadrum.Game.Modules.Simulation.Application;
-using revecs.Systems.Generator;
 using revghost;
 using revghost.Module;
 using revghost.Utility;

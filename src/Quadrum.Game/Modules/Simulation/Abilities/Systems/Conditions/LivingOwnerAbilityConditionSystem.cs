@@ -1,7 +1,3 @@
-using Quadrum.Game.Modules.Simulation.Abilities.Components;
-using Quadrum.Game.Modules.Simulation.Units;
-using revecs.Systems.Generator;
-
 namespace Quadrum.Game.Modules.Simulation.Abilities.Systems.Conditions;
 
 /*public partial struct LivingOwnerAbilityConditionSystem : IRevolutionSystem,

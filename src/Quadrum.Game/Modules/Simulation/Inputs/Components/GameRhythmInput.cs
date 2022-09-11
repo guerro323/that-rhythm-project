@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using Quadrum.Game.Utilities;
-using revecs.Extensions.Buffers;
 using revecs.Extensions.Generator.Components;
 
 namespace PataNext.Game.Client.Core.Inputs;

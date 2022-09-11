@@ -16,7 +16,6 @@ using revecs.Core;
 using revecs.Extensions.Generator.Components;
 using revghost;
 using revghost.Ecs;
-using revghost.Injection.Dependencies;
 using revghost.Utility;
 using DistanceInput = Quadrum.Game.Modules.Simulation.Common.Physics.DistanceInput;
 using DistanceOutput = Quadrum.Game.Modules.Simulation.Common.Physics.DistanceOutput;

@@ -2,8 +2,6 @@ using DefaultEcs;
 using DefaultEcs.Resource;
 using revghost;
 using revghost.Ecs;
-using revghost.Injection;
-using revghost.Injection.Dependencies;
 using revghost.IO.Storage;
 
 namespace Quadrum.Game.Modules.Client.Audio.Client;

@@ -1,4 +1,3 @@
-using CSScripting;
 using revghost.IO.Storage;
 
 namespace Quadrum.Game.BGM;

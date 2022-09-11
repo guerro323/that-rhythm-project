@@ -1,6 +1,5 @@
 using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.Common.Systems;
-using revecs.Systems.Generator;
 using revghost;
 using revghost.Ecs;
 

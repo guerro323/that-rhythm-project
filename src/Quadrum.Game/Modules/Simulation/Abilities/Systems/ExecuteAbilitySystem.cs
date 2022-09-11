@@ -5,7 +5,6 @@ using Quadrum.Game.Modules.Simulation.Abilities.Components;
 using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.Common.Systems;
 using Quadrum.Game.Utilities;
-using revecs;
 using revecs.Core;
 using revecs.Querying;
 using revecs.Systems;

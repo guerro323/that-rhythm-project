@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Quadrum.Game.Utilities;
 using revecs.Extensions.Generator.Components;
-using revecs.Utility;
 
 namespace Quadrum.Game.Modules.Simulation.Common.Transform;
 

@@ -25,9 +25,6 @@
 // SOFTWARE.
 */
 
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Box2D.NetStandard.Collision;
 
 namespace Box2D.NetStandard.Common

@@ -1,15 +1,12 @@
 using System;
 using DefaultEcs;
-using PataNext.Game.Client.Core.Inputs;
 using Quadrum.Game.Modules.Simulation.Application;
 using Quadrum.Game.Modules.Simulation.Common.Systems;
-using Quadrum.Game.Modules.Simulation.Players;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Commands.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Components;
 using Quadrum.Game.Modules.Simulation.RhythmEngine.Utility;
 using Quadrum.Game.Utilities;
 using revecs;
-using revecs.Systems.Generator;
 using revghost;
 
 namespace Quadrum.Game.Modules.Simulation.RhythmEngine.Systems;

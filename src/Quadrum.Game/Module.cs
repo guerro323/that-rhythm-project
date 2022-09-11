@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using Quadrum.Game.BGM;
+﻿using Quadrum.Game.BGM;
 using revghost;
 using revghost.Module;
 

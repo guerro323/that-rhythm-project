@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics;
 using DefaultEcs;
 using revecs.Core;
-using revecs.Core.Boards;
-using revecs.Systems;
 using revghost;
 using revghost.Domains;
 using revghost.Domains.Time;

@@ -3,7 +3,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Collections.Pooled;
 using revghost.IO.Storage;
 
 namespace Quadrum.Game.BGM;
