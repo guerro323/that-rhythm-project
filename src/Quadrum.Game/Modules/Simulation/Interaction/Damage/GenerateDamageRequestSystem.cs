@@ -58,8 +58,8 @@ public partial class GenerateDamageRequestSystem : SimulationSystem
     private partial record struct EventQuery : IQuery<Read<HitBoxEvent>>;
 
     private partial record struct Commands :
-        Simulation.Damage.TargetDamageEvent.Cmd.IAdmin,
-        Simulation.Damage.DamageFrameData.Cmd.IAdmin,
+        TargetDamageEvent.Cmd.IAdmin,
+        DamageFrameData.Cmd.IAdmin,
         PositionComponent.Cmd.IAdmin,
         ICmdEntityAdmin;
 }

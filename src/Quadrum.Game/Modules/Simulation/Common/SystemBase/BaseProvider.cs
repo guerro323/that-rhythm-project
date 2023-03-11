@@ -15,7 +15,14 @@ public abstract class BaseProvider : SimulationSystem
     {
     }
 
-    public abstract UEntityHandle SpawnEntity(Entity data);
+    public UEntityHandle SpawnEntity(Entity data)
+    {
+        var handle = Simulation.CreateEntity();
+        SetEntityData(ref handle, data);
+        return handle;
+    }
+    
+    public abstract void SetEntityData(ref UEntityHandle handle, Entity data);
 }
 
 public abstract class BaseProvider<TCreateData> : BaseProvider
@@ -25,10 +32,17 @@ public abstract class BaseProvider<TCreateData> : BaseProvider
     {
     }
 
-    public override UEntityHandle SpawnEntity(Entity data)
+    public abstract void SetEntityData(ref UEntityHandle handle, TCreateData data);
+
+    public override void SetEntityData(ref UEntityHandle handle, Entity data)
     {
-        return SpawnEntity(data.Get<TCreateData>());
+        SetEntityData(ref handle, data.Get<TCreateData>());
     }
 
-    public abstract UEntityHandle SpawnEntity(TCreateData data);
+    public UEntityHandle SpawnEntity(TCreateData data)
+    {
+        var handle = Simulation.CreateEntity();
+        SetEntityData(ref handle, data);
+        return handle;
+    }
 }
