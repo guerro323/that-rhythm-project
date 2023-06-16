@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using DefaultEcs;
 using revecs.Core;
 using revghost;
@@ -8,6 +9,7 @@ using revghost.Domains.Time;
 using revghost.Injection;
 using revghost.Loop;
 using revghost.Loop.EventSubscriber;
+using revghost.Shared.Collections;
 using revghost.Shared.Threading.Schedulers;
 using revghost.Threading.V2;
 using revghost.Threading.V2.Apps;
@@ -119,6 +121,16 @@ public class SimulationDomain : CommonDomainThreadListener
         };
         
         _previousLoopJob = _jobRunner.Queue(new JobExecuteLoop(_simulationLoop, gameTime));
+        if (DomainScope.Context.TryGet(out SchedulerDependencyResolver resolver))
+        {
+            var list = new ValueList<IDependencyCollection>(0);
+            resolver.GetQueuedCollections(ref list);
+            // If there is any dependency, complete the simulation job right now
+            if (list.Count > 0)
+                _jobRunner.CompleteBatch(_previousLoopJob, false);
+            
+            list.Dispose();
+        }
     }
 
     private readonly record struct JobExecuteLoop(SimulationUpdateLoop Loop, GameTime GameTime) : IJob
@@ -130,8 +142,8 @@ public class SimulationDomain : CommonDomainThreadListener
 
         public void Execute(IJobRunner runner, JobExecuteInfo info)
         {
-            var sw = new Stopwatch();
-            sw.Start();
+            //var sw = new Stopwatch();
+            //sw.Start();
             ((OpportunistJobRunner) runner).StartPerformanceCriticalSection();
             try
             {
@@ -141,8 +153,8 @@ public class SimulationDomain : CommonDomainThreadListener
             {
                 ((OpportunistJobRunner) runner).StopPerformanceCriticalSection();
             }
-            sw.Stop();
-            Console.WriteLine($"Frame={sw.Elapsed.TotalMilliseconds:F3}ms");
+            //sw.Stop();
+            // Console.WriteLine($"Frame={sw.Elapsed.TotalMilliseconds:F3}ms");
         }
     }
 
