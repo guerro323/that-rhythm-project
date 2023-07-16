@@ -35,12 +35,12 @@ public partial class ComboAbilityConditionSystem : BaseConditionSystem
         var condition = _cmd.ReadComboAbilityCondition(ability);
 
         return IsComboIdentical(
-            condition.Span.UnsafeCast<ComboAbilityCondition, ComponentType>(),
+            condition.Span.UnsafeCast<ComboAbilityCondition, UEntitySafe>(),
             active.Combo.Span
         );
     }
     
-    private bool IsComboIdentical(ReadOnlySpan<ComponentType> abilityCombo, ReadOnlySpan<UEntityHandle> unitCombo)
+    private bool IsComboIdentical(ReadOnlySpan<UEntitySafe> abilityCombo, ReadOnlySpan<UEntityHandle> unitCombo)
     {
         var start = unitCombo.Length - abilityCombo.Length;
         var end   = unitCombo.Length;
@@ -50,7 +50,7 @@ public partial class ComboAbilityConditionSystem : BaseConditionSystem
 
         for (var i = start; i != end; i++)
         {
-            if (!Simulation.HasComponent(unitCombo[i], abilityCombo[i - start]))
+            if (unitCombo[i].Id != abilityCombo[i - start].Handle.Id)
                 return false;
         }
 

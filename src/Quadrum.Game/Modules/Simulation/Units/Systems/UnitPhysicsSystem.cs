@@ -16,7 +16,10 @@ public partial class UnitPhysicsSystem : SimulationSystem
 {
     public UnitPhysicsSystem(Scope scope) : base(scope)
     {
-        SubscribeTo<ISimulationUpdateLoopSubscriber>(OnUpdate);
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnUpdate,
+            order => order.After(typeof(UnitCalculatePlayStateSystem))
+        );
     }
 
     private GameTimeQuery _timeQuery;
@@ -115,7 +118,7 @@ public partial class UnitPhysicsSystem : SimulationSystem
                 unit.controller.PassThroughEnemies = false; // TODO: set it to true once we add LivableIsDead
                 unit.controller.PreviousPosition = previousPosition;
             }
-        }, (delta, _cmd));
+        }, (delta, _cmd), true);
     }
 
     public partial record struct UnitQuery : IQuery<(

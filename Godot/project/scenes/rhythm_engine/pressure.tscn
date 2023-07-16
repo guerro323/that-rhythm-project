@@ -1,0 +1,295 @@
+[gd_scene load_steps=7 format=3 uid="uid://cr02sluoon4l7"]
+
+[ext_resource type="Shader" path="res://shaders/ui/sdf_circle.gdshader" id="1_phacx"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wgjf7"]
+shader = ExtResource("1_phacx")
+shader_parameter/radius = 1.0
+shader_parameter/start_radius = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m6gnt"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_b6um1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel3:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(7, 7)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Panel4:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(12, 12)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Panel4/AspectRatioContainer:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(7.25, 12.0001)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Panel2:self_modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.5, 0.5, 0.5, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Panel4/AspectRatioContainer:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0.8)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Panel4:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.995, 0.995)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Panel4:modulate")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.8, 0.8, 0.8, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_cw2pk"]
+resource_name = "trigger"
+length = 0.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel4:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.253848),
+"transitions": PackedFloat32Array(2, 2.21914),
+"update": 0,
+"values": [Vector2(12, 15), Vector2(12, 12)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Panel4/AspectRatioContainer:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.243088),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(7.25, 11), Vector2(7.25, 12)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Panel2:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.100095, 0.28551),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(0.5, 0.5, 0.5, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Panel4/AspectRatioContainer:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.102138, 0.212447),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.8), Color(0, 0, 0, 0.8)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Panel4:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.240024),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.2, 0.956), Vector2(0.995, 0.995)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Panel4:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.100095, 0.5),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(0.75, 0.75, 0.75, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_7vrtm"]
+_data = {
+"RESET": SubResource("Animation_b6um1"),
+"trigger": SubResource("Animation_cw2pk")
+}
+
+[node name="Pressure" type="Control"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+
+[node name="Control" type="Control" parent="."]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = -23.0
+offset_right = 23.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(23, 23)
+
+[node name="Panel" type="Panel" parent="Control"]
+self_modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_wgjf7")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_m6gnt")
+
+[node name="Panel2" type="Panel" parent="Control"]
+self_modulate = Color(0.5, 0.5, 0.5, 1)
+material = SubResource("ShaderMaterial_wgjf7")
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_m6gnt")
+
+[node name="Panel3" type="Panel" parent="Control"]
+self_modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_wgjf7")
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_m6gnt")
+
+[node name="Panel4" type="Panel" parent="Control"]
+modulate = Color(0.8, 0.8, 0.8, 1)
+self_modulate = Color(0.419608, 0.678431, 1, 1)
+material = SubResource("ShaderMaterial_wgjf7")
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -11.0
+offset_top = -11.0
+offset_right = 11.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.995, 0.995)
+pivot_offset = Vector2(11, 11)
+theme_override_styles/panel = SubResource("StyleBoxFlat_m6gnt")
+
+[node name="AspectRatioContainer" type="Control" parent="Control/Panel4"]
+modulate = Color(0, 0, 0, 0.8)
+custom_minimum_size = Vector2(7.5, 6.5)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -3.75
+offset_top = 1.0001
+offset_right = 3.75
+offset_bottom = 7.50011
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(3.75, 3.25)
+
+[node name="Polygon2D" type="Polygon2D" parent="Control/Panel4/AspectRatioContainer"]
+offset = Vector2(3.75, 0)
+antialiased = true
+polygon = PackedVector2Array(-3.75, 6.5, 3.75, 6.5, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Control"]
+libraries = {
+"": SubResource("AnimationLibrary_7vrtm")
+}

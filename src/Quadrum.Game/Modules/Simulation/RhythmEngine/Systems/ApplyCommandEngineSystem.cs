@@ -103,9 +103,11 @@ public partial class ApplyCommandEngineSystem : SimulationSystem
                 var wasFever = engine.ComboSettings.CanEnterFever(engine.ComboState);
 
                 engine.ComboState.Count++;
-                engine.ComboState.Score += (float) (engine.Executing.Power - 0.5) * 2;
+                engine.ComboState.Score += (float) (engine.Executing.Power - 0.5) * 0.5f;
                 if (engine.ComboState.Score < 0)
                     engine.ComboState.Score = 0;
+                if (engine.ComboState.Score > 1)
+                    engine.ComboState.Score = 1;
 
                 // We have a little bonus when doing a perfect command
                 /*if (executing.IsPerfect

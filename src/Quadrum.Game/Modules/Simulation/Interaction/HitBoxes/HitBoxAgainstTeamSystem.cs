@@ -54,9 +54,10 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
                 }
 
                 ref readonly var hitbox = ref iter.hitbox;
-                if (history.IsCreated && history.Count >= hitbox.MaxHits)
+                if (history.IsCreated && (history.Count >= hitbox.MaxHits && hitbox.MaxHits > 0))
                     continue;
 
+                Console.WriteLine("bruh");
                 var thisPosition = iter.pos.Value;
                 var thisVelocity = Vector2.Zero;
                 if (cmd.HasVelocityComponent(iter.Handle))
@@ -67,22 +68,32 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
                 }
 
                 var hostiles = Span<UEntityHandle>.Empty;
-                if (cmd.HasTeamHostileDescription(iter.Handle))
-                    hostiles = cmd.ReadTeamHostileDescription(iter.Handle);
+                if (cmd.HasTeamHostileDescription(iter.component.TeamTarget.Handle))
+                    hostiles = cmd.ReadTeamHostileDescription(iter.component.TeamTarget.Handle);
 
                 foreach (var hostile in hostiles)
                 {
+                    Console.WriteLine($"hostile: {hostile}");
+                    
                     var children = cmd.ReadTeamDescription(hostile);
                     foreach (var child in children)
                     {
+                        Console.WriteLine($"against {child}");
                         if (false == mask.GetMatchedArchetypes()
                                 .Contains(archetypes[child.Id]))
+                        {
+                            Console.WriteLine("nope");
                             continue;
+                        }
 
                         var safeChild = cmd.Safe(child);
                         if (history.Contains((ref HitBoxHistory h) => ref h.Victim, safeChild))
+                        {
+                            Console.WriteLine("nope");
                             continue;
+                        }
 
+                        Console.WriteLine("perhaps?");
                         var o = cmd.Distance(new DistanceInput(thisVelocity, origin: new DistanceInput.EntityOverrides
                         {
                             Position = thisPosition
@@ -102,7 +113,7 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
                             var instigator = default(UEntityHandle);
                             if (cmd.HasHitBoxOwnerDescriptionRelative(hitBox))
                                 instigator = cmd.ReadHitBoxOwnerDescriptionRelative(hitBox);
-
+                            
                             cmd.AddHitBoxEvent(ev, new HitBoxEvent(
                                 cmd.Safe(hitBox),
                                 cmd.Safe(instigator),
@@ -112,6 +123,7 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
                                 o.Normal,
                                 o.Distance
                             ));
+                            cmd.AddSystemEventTag(ev);
                         }, (cmd, iter.Handle, safeChild, o));
                     }
                 }
@@ -130,6 +142,7 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
         _hitboxQuery = new HitBoxQuery(Simulation);
         _eventQuery = new EventQuery(Simulation);
         _mask = new ColliderMask(Simulation);
+        _cmd = new Commands(Simulation);
     }
 
     private void OnUpdate(Entity _)
@@ -141,7 +154,7 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
             Simulation.DestroyEntities(Simulation.ArchetypeBoard.GetEntities(archetype));
         }
 
-        _hitboxQuery.QueueAndComplete(Runner, _onForeachHitBoxes);
+        _hitboxQuery.QueueAndComplete(Runner, _onForeachHitBoxes, true);
         _scheduler.Run();
     }
 
@@ -165,6 +178,7 @@ public partial class HitBoxAgainstTeamSystem : SimulationSystem
         TeamDescription.Cmd.IRead,
         HitBoxEvent.Cmd.IAdmin,
         HitBoxOwnerDescription.Relative.Cmd.IRead,
+        SystemEventTag.Cmd.IAdmin,
         IPhysicsCmdRead,
         ICmdEntitySafe,
         ICmdEntityAdmin;

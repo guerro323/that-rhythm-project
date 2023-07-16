@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'ExportRelease' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'ExportDebug' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="revghost" Version="0.0.0-local" />
+        <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\Quadrum.Game.Super\Quadrum.Game.Super.csproj" />
+      <ProjectReference Include="..\Quadrum.Game\Quadrum.Game.csproj" />
+    </ItemGroup>
+
+
+
+
+
+
+    <ItemGroup>
+        <EmbeddedResource Include="Descriptions\**\*" />
+    </ItemGroup>
+
+
+</Project>

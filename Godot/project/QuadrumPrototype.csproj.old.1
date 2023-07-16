@@ -1,0 +1,36 @@
+<Project Sdk="Godot.NET.Sdk/4.1.0-dev.4">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <ImplicitUsings>true</ImplicitUsings>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>../Generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="revghost" Version="0.0.0-local" />
+    <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Quadrum.Game/Quadrum.Game.csproj" />
+    <ProjectReference Include="..\..\src\Quadrum.Game.Super\Quadrum.Game.Super.csproj" />
+    <ProjectReference Include="..\..\src\Quadrum.Modules.Abilities\Quadrum.Modules.Abilities.csproj" />
+  </ItemGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'ExportRelease' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'ExportDebug' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,10 @@
+[gd_resource type="SystemFont" format=3 uid="uid://br88jsh1vd52p"]
+
+[resource]
+font_names = PackedStringArray("URW Gothic")
+font_italic = true
+font_weight = 999
+force_autohinter = true
+multichannel_signed_distance_field = true
+msdf_pixel_range = 64
+msdf_size = 128

@@ -102,7 +102,7 @@ public partial class MarchAbilityAspectSystem : SimulationSystem
                     controllerState.ControlOverVelocityX = true;
                 }
             }
-        }, (time.Delta, _cmd));
+        }, (time.Delta, _cmd), true);
     }
 
     private partial record struct AbilityQuery : IQuery<(

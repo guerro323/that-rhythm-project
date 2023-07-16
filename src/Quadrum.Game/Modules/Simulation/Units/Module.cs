@@ -16,6 +16,8 @@ public class Module : HostModule
         TrackDomain((SimulationDomain domain) =>
         {
             _ = new UnitPhysicsSystem(domain.Scope);
+            _ = new UnitPhysicsRestrictToTeamAreaSystem(domain.Scope);
+            _ = new UnitCalculatePlayStateSystem(domain.Scope);
         });
     }
 }

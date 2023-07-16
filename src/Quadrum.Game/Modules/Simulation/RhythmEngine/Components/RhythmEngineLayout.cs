@@ -18,6 +18,7 @@ public partial struct RhythmEngineLayout : IEntityLayoutComponent
 
             GameComboState.Type.GetOrCreate(world),
             GameComboSettings.Type.GetOrCreate(world),
+            PowerGaugeState.Type.GetOrCreate(world),
             
             GameCommandState.Type.GetOrCreate(world),
             RhythmEngineExecutingCommand.Type.GetOrCreate(world),

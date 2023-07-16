@@ -1,3 +1,4 @@
+using System;
 using DefaultEcs;
 using PataNext.Game.Client.Core.Inputs;
 using Quadrum.Game.Modules.Simulation.Application;
@@ -50,7 +51,7 @@ public partial class OnRhythmInputSystem : SimulationSystem
             // Don't accept inputs when the rhythm engine hasn't yet started
             if (flowBeat < 0)
                 return;
-
+            
             for (var i = 0; i < input.Actions.Length; i++)
             {
                 ref readonly var action = ref input.Actions[i];
@@ -98,6 +99,16 @@ public partial class OnRhythmInputSystem : SimulationSystem
                 };
 
                 // TODO: add an event (eg: for increasing summon energy)
+                if (engine.ComboState.Count > 0) // No spamming to get score
+                {
+                    var multiplier = 1.0f;
+                    multiplier = MathUtils.LerpNormalized(multiplier, 2f, ((int) (engine.ComboState.Score * 4)) * 0.25f);
+
+                    if (engine.ComboState.Score >= 1.0f)
+                        multiplier += 0.5f;
+
+                    engine.PowerState.Increase((int) ((1f - Math.Abs(pressure.Score)) * multiplier * 5));
+                }
 
                 engine.Progress.Add(new RhythmEngineCommandProgress {Value = pressure});
                 engine.State.LastPressure = pressure;
@@ -114,6 +125,8 @@ public partial class OnRhythmInputSystem : SimulationSystem
         Write<RhythmEngineRecoveryState> Recovery,
         Read<PlayerDescription.Relative> Relative,
         Write<GameCommandState> CommandState,
+        Write<GameComboState> ComboState,
+        Write<PowerGaugeState> PowerState,
         All<RhythmEngineIsPlaying>)>;
 
     private partial record struct Commands : GameRhythmInput.Cmd.IRead;

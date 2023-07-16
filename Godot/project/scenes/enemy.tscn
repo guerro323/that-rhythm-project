@@ -1,0 +1,167 @@
+[gd_scene load_steps=10 format=3 uid="uid://w5br2vm5hodv"]
+
+[ext_resource type="PackedScene" uid="uid://c0tgapcgl2a8w" path="res://resources/3d_models/crystal.glb" id="1_3lach"]
+[ext_resource type="Material" uid="uid://bolorwvlh682d" path="res://resources/3d_models/crystal_mat.tres" id="2_ii7fl"]
+
+[sub_resource type="GDScript" id="GDScript_2vrtd"]
+script/source = "extends Node3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+func on_hit():
+	var player = $crystal/AnimationPlayer
+	player.stop()
+	player.play(\"on_hit\")
+"
+
+[sub_resource type="GDScript" id="GDScript_u3vyo"]
+script/source = "extends Node3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var tween = create_tween()
+	tween.set_loops()
+	tween.set_trans(Tween.TRANS_LINEAR)
+	tween.tween_property(self, \"position\", Vector3(0., 0.5 + -0.1, 0.), 0.5)
+	tween = tween.chain()
+	tween.tween_property(self, \"position\", Vector3(0., 0.5 + 0.1, 0.), 0.5)
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	rotate_y(delta)
+	pass
+"
+
+[sub_resource type="Gradient" id="Gradient_p5cjs"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.25)
+colors = PackedColorArray(0, 0, 0, 0.392157, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_cqiiw"]
+gradient = SubResource("Gradient_p5cjs")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 1)
+
+[sub_resource type="Animation" id="Animation_psk4l"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Enemy/crystal/Cube:surface_material_override/0:shader_parameter/albedo")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 0.509804, 0.513726, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Enemy/crystal:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Enemy/crystal:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.25, 0.25, 0.25)]
+}
+
+[sub_resource type="Animation" id="Animation_1sf0l"]
+resource_name = "on_hit"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Enemy/crystal/Cube:surface_material_override/0:shader_parameter/albedo")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 0.509804, 0.513726, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Enemy/crystal:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, -0.155125), Vector3(0, 0, 0.0349066), Vector3(0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Enemy/crystal:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.0957568, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.24, 0.24, 0.24), Vector3(0.25, 0.25, 0.25), Vector3(0.26, 0.26, 0.26), Vector3(0.25, 0.25, 0.25)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_dqr0y"]
+_data = {
+"RESET": SubResource("Animation_psk4l"),
+"on_hit": SubResource("Animation_1sf0l")
+}
+
+[node name="Enemy" type="Node3D"]
+script = SubResource("GDScript_2vrtd")
+
+[node name="crystal" parent="." instance=ExtResource("1_3lach")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0.487602, 0)
+script = SubResource("GDScript_u3vyo")
+
+[node name="Cube" parent="crystal" index="1"]
+surface_material_override/0 = ExtResource("2_ii7fl")
+
+[node name="Decal" type="Decal" parent="crystal"]
+transform = Transform3D(-1.84935, 0, -3.54682, 0, 4, 0, 3.54682, 0, -1.84935, 0, -2.0862, 0)
+size = Vector3(2, 0.57796, 2)
+texture_albedo = SubResource("GradientTexture2D_cqiiw")
+upper_fade = 0.00377319
+lower_fade = 4.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="crystal"]
+root_node = NodePath("../../..")
+libraries = {
+"": SubResource("AnimationLibrary_dqr0y")
+}
+
+[editable path="crystal"]

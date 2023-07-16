@@ -1,0 +1,504 @@
+[gd_scene load_steps=41 format=3 uid="uid://cm74gb0nby6r7"]
+
+[ext_resource type="Script" path="res://scripts/ui/rhythm_engine/rhythm_engine_control.gd" id="1_bvjfa"]
+[ext_resource type="AudioStream" uid="uid://dsgk0jn3tt5qf" path="res://resources/audio/metronome0.wav" id="2_qtqvh"]
+[ext_resource type="AudioStream" uid="uid://dj2k5j6p7wbmf" path="res://resources/audio/metronome_end_of_command.wav" id="3_s8qw7"]
+[ext_resource type="AudioStream" uid="uid://drewph8d3yikn" path="res://resources/audio/drums/drum_1_0.ogg" id="4_efdxx"]
+[ext_resource type="AudioStream" uid="uid://bcoa78mx0hsx3" path="res://resources/audio/drums/drum_2_0.ogg" id="5_2r5sn"]
+[ext_resource type="AudioStream" uid="uid://bg2s2gb8cms1c" path="res://resources/audio/drums/drum_3_0.ogg" id="6_mjrsl"]
+[ext_resource type="AudioStream" uid="uid://c0drqnhin48x3" path="res://resources/audio/drums/drum_4_0.ogg" id="7_mf620"]
+[ext_resource type="AudioStream" uid="uid://bbeff0v8hans7" path="res://resources/audio/drums/drum_1_1.ogg" id="8_vc4tw"]
+[ext_resource type="AudioStream" uid="uid://bu7kg2p87l36t" path="res://resources/audio/drums/drum_2_1.ogg" id="9_hq7gi"]
+[ext_resource type="AudioStream" uid="uid://yqrek24wu76j" path="res://resources/audio/drums/drum_3_1.ogg" id="10_raskb"]
+[ext_resource type="AudioStream" uid="uid://du5mf04x4ox8l" path="res://resources/audio/drums/drum_4_1.ogg" id="11_apbel"]
+[ext_resource type="Shader" path="res://shaders/ui/rhythm_engine_label_power.gdshader" id="12_4o1vc"]
+[ext_resource type="FastNoiseLite" uid="uid://chvccjrvjb8hi" path="res://scenes/noise_1.tres" id="13_qhity"]
+[ext_resource type="SystemFont" uid="uid://br88jsh1vd52p" path="res://fonts/numeric.tres" id="14_8nbfu"]
+[ext_resource type="Script" path="res://scripts/ui/rhythm_engine/power_label.gd" id="15_vfhjy"]
+[ext_resource type="Shader" path="res://shaders/ui/sdf_circle.gdshader" id="16_fo1tw"]
+[ext_resource type="Script" path="res://scripts/ui/rhythm_engine/fever_gauge_control.gd" id="17_x6lxp"]
+[ext_resource type="Shader" path="res://shaders/ui/rhythm_engine_quart_circle.gdshader" id="18_pl03f"]
+[ext_resource type="PackedScene" uid="uid://bf3phhrx36ptl" path="res://scenes/rhythm_engine/gauge_fever.tscn" id="19_mh4x8"]
+[ext_resource type="Script" path="res://scripts/ui/rhythm_engine/pressures_control.gd" id="20_2dc74"]
+[ext_resource type="PackedScene" uid="uid://cr02sluoon4l7" path="res://scenes/rhythm_engine/pressure.tscn" id="21_tnox4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dc022"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Gradient" id="Gradient_p0gxi"]
+offsets = PackedFloat32Array(0, 0.0584416, 0.116883, 0.194805, 0.272727, 0.363636, 0.512987, 0.61039, 0.733766, 0.915584, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.038447, 0.038402, 0.0382277, 1, 0.952055, 0.951626, 0.949958, 1, 0.520621, 0.517498, 0.505435, 1, 0.0098757, 0.00821394, 0.0035699, 1, 0.298582, 0.270258, 0.165681, 1, 0.00573787, 0.00566817, 0.0054033, 1, 0.741385, 0.741385, 0.741385, 1, 0.973535, 0.973535, 0.973535, 1, 0.00820202, 0.00820202, 0.00820202, 1, 1, 1, 1, 1)
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_je2q0"]
+seamless = true
+color_ramp = SubResource("Gradient_p0gxi")
+noise = ExtResource("13_qhity")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mw70n"]
+shader = ExtResource("12_4o1vc")
+shader_parameter/sdf_box = Vector2(0, -0.55)
+shader_parameter/msdf_pixel_range = 1.0
+shader_parameter/msdf_outline_size = 0.1
+shader_parameter/progress = 1.0
+shader_parameter/foreground_color = Color(1, 0.815686, 0.2, 1)
+shader_parameter/foreground_grad_color = Color(1, 0.560784, 0.2, 1)
+shader_parameter/flames_power = 1.0
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_je2q0")
+
+[sub_resource type="FontVariation" id="FontVariation_0wgtv"]
+base_font = ExtResource("14_8nbfu")
+variation_embolden = 0.25
+variation_transform = Transform2D(1, 0.25, 0, 1, 0, 0)
+spacing_bottom = -32
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k408c"]
+shader = ExtResource("16_fo1tw")
+shader_parameter/radius = 1.0
+shader_parameter/start_radius = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vfkpl"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bd3mb"]
+shader = ExtResource("18_pl03f")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 1.0
+shader_parameter/gauge_offset = 0.0
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y6m88"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lpaju"]
+resource_local_to_scene = true
+shader = ExtResource("18_pl03f")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 0.25
+shader_parameter/gauge_offset = 0.0
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kvyhr"]
+resource_local_to_scene = true
+shader = ExtResource("18_pl03f")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 0.25
+shader_parameter/gauge_offset = 0.0
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tr6ar"]
+resource_local_to_scene = true
+shader = ExtResource("18_pl03f")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 0.25
+shader_parameter/gauge_offset = 0.0
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3weo5"]
+resource_local_to_scene = true
+shader = ExtResource("18_pl03f")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 0.25
+shader_parameter/gauge_offset = 0.0
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4ertj"]
+shader = ExtResource("16_fo1tw")
+shader_parameter/radius = 1.0
+shader_parameter/start_radius = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yv736"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aoc16"]
+shader = ExtResource("16_fo1tw")
+shader_parameter/radius = 1.0
+shader_parameter/start_radius = 0.0
+
+[sub_resource type="FontVariation" id="FontVariation_fqjt5"]
+base_font = ExtResource("14_8nbfu")
+variation_embolden = 0.45
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qbxkv"]
+shader = ExtResource("16_fo1tw")
+shader_parameter/radius = 1.0
+shader_parameter/start_radius = 0.6
+
+[sub_resource type="GDScript" id="GDScript_u2j51"]
+resource_name = "FpsDisplay"
+script/source = "extends Label
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+var refresh: float = 0.
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if refresh > 0.:
+		refresh -= delta
+		return
+		
+	refresh = 0.1
+	text = \"fps: %d\" % int(1 / delta)
+	pass
+"
+
+[node name="rhythm_engine_interface" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bvjfa")
+metronome_sounds = Array[AudioStream]([ExtResource("2_qtqvh")])
+metronome_end_command = ExtResource("3_s8qw7")
+drum_perfect_sounds = Array[AudioStream]([ExtResource("4_efdxx"), ExtResource("5_2r5sn"), ExtResource("6_mjrsl"), ExtResource("7_mf620")])
+drum_normal_sounds = Array[AudioStream]([ExtResource("8_vc4tw"), ExtResource("9_hq7gi"), ExtResource("10_raskb"), ExtResource("11_apbel")])
+
+[node name="Panel2" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -180.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dc022")
+
+[node name="PowerLabel" type="Label" parent="Panel2"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_mw70n")
+layout_mode = 0
+offset_left = 62.0
+offset_top = 33.0
+offset_right = 197.0
+offset_bottom = 152.0
+theme_override_fonts/font = SubResource("FontVariation_0wgtv")
+theme_override_font_sizes/font_size = 96
+text = "QUADRUM"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("15_vfhjy")
+power_progress = 1.0
+power_level = 1
+is_at_max_level = true
+
+[node name="Container" type="Control" parent="Panel2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -49.0
+offset_top = -49.0
+offset_right = 49.0
+offset_bottom = 49.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(49, 49)
+
+[node name="Panel" type="Panel" parent="Panel2/Container"]
+self_modulate = Color(0.25, 0.25, 0.25, 1)
+material = SubResource("ShaderMaterial_k408c")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vfkpl")
+
+[node name="sub" type="Panel" parent="Panel2/Container/Panel"]
+self_modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_k408c")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.94, 0.94)
+pivot_offset = Vector2(49, 49)
+theme_override_styles/panel = SubResource("StyleBoxFlat_vfkpl")
+
+[node name="FeverGauge" type="Control" parent="Panel2/Container"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(40, 40)
+script = ExtResource("17_x6lxp")
+progress = 0.00635542
+
+[node name="Bg" type="Panel" parent="Panel2/Container/FeverGauge"]
+self_modulate = Color(0.12549, 0.12549, 0.12549, 1)
+material = SubResource("ShaderMaterial_bd3mb")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 6.28318
+pivot_offset = Vector2(40, 40)
+theme_override_styles/panel = SubResource("StyleBoxFlat_y6m88")
+
+[node name="0_TopRight" parent="Panel2/Container/FeverGauge" instance=ExtResource("19_mh4x8")]
+material = SubResource("ShaderMaterial_lpaju")
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 1
+grow_vertical = 1
+sub_progress = 0.0254217
+
+[node name="1_BottomRight" parent="Panel2/Container/FeverGauge" instance=ExtResource("19_mh4x8")]
+self_modulate = Color(0.2, 0.133333, 0, 0)
+material = SubResource("ShaderMaterial_kvyhr")
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 1
+grow_vertical = 1
+rotation = 3.14159
+sub_progress = 0.0
+
+[node name="2_BottomLeft" parent="Panel2/Container/FeverGauge" instance=ExtResource("19_mh4x8")]
+self_modulate = Color(0.2, 0.133333, 0, 0)
+material = SubResource("ShaderMaterial_tr6ar")
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 1
+grow_vertical = 1
+rotation = 4.71239
+sub_progress = 0.0
+
+[node name="3_TopLeft" parent="Panel2/Container/FeverGauge" instance=ExtResource("19_mh4x8")]
+self_modulate = Color(0.2, 0.133333, 0, 0)
+material = SubResource("ShaderMaterial_3weo5")
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 1
+grow_vertical = 1
+rotation = 6.28319
+sub_progress = 0.0
+
+[node name="Hack" type="Panel" parent="Panel2/Container/FeverGauge"]
+modulate = Color(0, 0, 0, 1)
+self_modulate = Color(0.12549, 0.12549, 0.12549, 1)
+material = SubResource("ShaderMaterial_4ertj")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -0.000183105
+offset_top = 0.000183105
+offset_right = -0.000183105
+offset_bottom = 0.000183105
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 6.28318
+scale = Vector2(0.6, 0.6)
+pivot_offset = Vector2(40, 40)
+theme_override_styles/panel = SubResource("StyleBoxFlat_y6m88")
+
+[node name="Panel3" type="Panel" parent="Panel2/Container"]
+custom_minimum_size = Vector2(9, 0)
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_yv736")
+
+[node name="Panel4" type="Panel" parent="Panel2/Container"]
+custom_minimum_size = Vector2(0, 9)
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_yv736")
+
+[node name="ComboBg" type="Panel" parent="Panel2/Container"]
+self_modulate = Color(0.12549, 0.12549, 0.12549, 1)
+material = SubResource("ShaderMaterial_aoc16")
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -17.5001
+offset_top = -17.4999
+offset_right = 17.4999
+offset_bottom = 17.5001
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 6.28318
+pivot_offset = Vector2(17, 17)
+theme_override_styles/panel = SubResource("StyleBoxFlat_y6m88")
+
+[node name="ComboLabel" type="Label" parent="Panel2/Container"]
+unique_name_in_owner = true
+self_modulate = Color(0.8, 0.521569, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_top = 5.0
+offset_right = -2.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("14_8nbfu")
+theme_override_font_sizes/font_size = 28
+text = "8"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label3" type="Label" parent="Panel2/Container"]
+self_modulate = Color(0.4, 0.26, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 63.0
+offset_bottom = -23.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = SubResource("FontVariation_fqjt5")
+theme_override_font_sizes/font_size = 8
+text = "COMBO"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PressuresControl" type="Control" parent="Panel2/Container"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(49, 49)
+script = ExtResource("20_2dc74")
+
+[node name="up" parent="Panel2/Container/PressuresControl" instance=ExtResource("21_tnox4")]
+layout_mode = 1
+
+[node name="Panel4" parent="Panel2/Container/PressuresControl/up/Control" index="3"]
+self_modulate = Color(0.490196, 1, 0.4, 1)
+
+[node name="down" parent="Panel2/Container/PressuresControl" instance=ExtResource("21_tnox4")]
+layout_mode = 1
+anchors_preset = 7
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+rotation = 3.14159
+
+[node name="Panel4" parent="Panel2/Container/PressuresControl/down/Control" index="3"]
+self_modulate = Color(1, 0.909804, 0.4, 1)
+
+[node name="right" parent="Panel2/Container/PressuresControl" instance=ExtResource("21_tnox4")]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
+rotation = 1.5708
+
+[node name="left" parent="Panel2/Container/PressuresControl" instance=ExtResource("21_tnox4")]
+layout_mode = 1
+anchors_preset = 4
+anchor_left = 0.0
+anchor_top = 0.5
+anchor_right = 0.0
+anchor_bottom = 0.5
+grow_horizontal = 1
+grow_vertical = 2
+rotation = -1.5708
+
+[node name="Panel4" parent="Panel2/Container/PressuresControl/left/Control" index="3"]
+self_modulate = Color(1, 0.4, 0.4, 1)
+
+[node name="sub" type="Panel" parent="Panel2/Container"]
+self_modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_qbxkv")
+custom_minimum_size = Vector2(164, 164)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -58.0
+offset_top = -58.0
+offset_right = 58.0
+offset_bottom = 58.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vfkpl")
+
+[node name="MetronomePlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_qtqvh")
+
+[node name="DrumPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_qtqvh")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 26.0
+text = "fps: 150"
+vertical_alignment = 1
+script = SubResource("GDScript_u2j51")
+
+[editable path="Panel2/Container/PressuresControl/up"]
+[editable path="Panel2/Container/PressuresControl/down"]
+[editable path="Panel2/Container/PressuresControl/left"]

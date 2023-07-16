@@ -12,6 +12,7 @@ using revecs.Extensions.Generator.Components;
 using revecs.Querying;
 using revecs.Systems;
 using revghost;
+using revghost.Threading;
 
 namespace Quadrum.Game.Modules.Simulation.Abilities.SystemBase;
 
@@ -23,6 +24,8 @@ public abstract class AbilityScript<T> : SimulationSystem
     private AbilitySetup _setupDelegate;
     private AbilityExecute _executeDelegate;
 
+    public ConcurrentScheduler PostScheduler;
+
     protected AbilityScript(Scope scope) : base(scope)
     {
         _setupDelegate = OnSetup;
@@ -33,6 +36,13 @@ public abstract class AbilityScript<T> : SimulationSystem
             b => b.SetGroup<AbilityExecutionSystemGroup>()
                 .Before(typeof(ExecuteAbilitySystem))
         );
+        SubscribeTo<ISimulationUpdateLoopSubscriber>(
+            OnPostUpdate,
+            b => b.SetGroup<AbilityExecutionSystemGroup>()
+                .After(typeof(ExecuteAbilitySystem))
+        );
+
+        PostScheduler = new ConcurrentScheduler();
     }
 
     private AbilitiesFunctionBoard _functionBoard;
@@ -82,6 +92,11 @@ public abstract class AbilityScript<T> : SimulationSystem
                 OnSetup(board.GetEntities(archetype));
             }
         }
+    }
+
+    private void OnPostUpdate(Entity _)
+    {
+        PostScheduler.Run();
     }
 
     protected override void OnDispose()

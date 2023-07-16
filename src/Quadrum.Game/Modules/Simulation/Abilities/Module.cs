@@ -34,6 +34,9 @@ public class Module : HostModule
                 
                 // Aspects
                 new MarchAbilityAspectSystem(domain.Scope),
+                
+                // Processors
+                new AbilityControlVelocitySystem(domain.Scope)
             });
         });
     }

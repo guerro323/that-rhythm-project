@@ -48,7 +48,7 @@ public partial class ResizeCommandBufferSystem : SimulationSystem
                     }
                 }
             }
-        });
+        }, true);
     }
 
     private partial record struct EngineQuery : IQuery<(

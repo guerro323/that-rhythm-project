@@ -11,7 +11,7 @@ public partial struct GameRhythmInput : ISparseComponent
     {
         public InterFramePressAction InterFrame;
         // Is the button currently being held?
-        public bool IsActive;
+        public TimeSpan ActiveTime;
         // For sliders
         public bool IsSliding;
     }

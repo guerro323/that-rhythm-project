@@ -1,0 +1,55 @@
+[gd_scene load_steps=6 format=3 uid="uid://bf3phhrx36ptl"]
+
+[ext_resource type="Shader" path="res://shaders/ui/rhythm_engine_quart_circle.gdshader" id="1_60hi2"]
+[ext_resource type="Script" path="res://scripts/ui/rhythm_engine/fever_gauge_control_subquart.gd" id="2_pwjrg"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tq26b"]
+resource_local_to_scene = true
+shader = ExtResource("1_60hi2")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 0.25
+shader_parameter/gauge_offset = 0.0
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y6m88"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6o3lw"]
+resource_local_to_scene = true
+shader = ExtResource("1_60hi2")
+shader_parameter/gauge_progress = 1.0
+shader_parameter/gauge_progress_factor = 0.25
+shader_parameter/gauge_offset = 0.1
+shader_parameter/edge_power = 0.0
+shader_parameter/circle_thickness = 0.35
+
+[node name="GaugeFever_Bg" type="Panel"]
+editor_description = "It is normal for the gauge to be 'not full' at the beginning, it is to make sure that the edge is rendered correctly"
+self_modulate = Color(0.2, 0.133333, 0, 1)
+material = SubResource("ShaderMaterial_tq26b")
+custom_minimum_size = Vector2(80, 80)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1840.0
+offset_bottom = -1000.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 1.5708
+pivot_offset = Vector2(40, 40)
+theme_override_styles/panel = SubResource("StyleBoxFlat_y6m88")
+script = ExtResource("2_pwjrg")
+sub_progress = 1.0
+
+[node name="Gauge" type="Panel" parent="."]
+self_modulate = Color(1, 0.65098, 0, 1)
+material = SubResource("ShaderMaterial_6o3lw")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(40, 40)
+theme_override_styles/panel = SubResource("StyleBoxFlat_y6m88")

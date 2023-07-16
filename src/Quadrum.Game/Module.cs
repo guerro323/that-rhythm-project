@@ -18,6 +18,7 @@ public class Module : HostModule
         // (They're not loaded from Modules.Simulation.Module since we want PataNext to be able to disable one of the modules
         {
             LoadModule(scope => new Modules.Simulation.RhythmEngine.Module(scope));
+            LoadModule(scope => new Modules.Simulation.Teams.Module(scope));
             LoadModule(scope => new Modules.Simulation.Units.Module(scope));
             LoadModule(scope => new Modules.Simulation.Abilities.Module(scope));
 

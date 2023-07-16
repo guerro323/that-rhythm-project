@@ -1,0 +1,102 @@
+[gd_scene load_steps=11 format=3 uid="uid://5dud3k56q3js"]
+
+[ext_resource type="Script" path="res://Code/ModuleBootstrap.cs" id="1_c6ute"]
+[ext_resource type="PackedScene" uid="uid://h2f4mlp53fhv" path="res://resources/3d_models/head_test.glb" id="2_xsy3i"]
+[ext_resource type="Shader" path="res://shaders/spatial/flexible_toon.gdshader" id="3_ukbo6"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_jwove"]
+rayleigh_color = Color(0.0980392, 0.180392, 0.34902, 1)
+mie_coefficient = 0.001
+mie_color = Color(0.835294, 0.933333, 0.972549, 1)
+ground_color = Color(1, 1, 1, 1)
+energy_multiplier = 2.0
+
+[sub_resource type="Sky" id="Sky_w5opv"]
+sky_material = SubResource("PhysicalSkyMaterial_jwove")
+
+[sub_resource type="Environment" id="Environment_ug0jw"]
+background_mode = 2
+sky = SubResource("Sky_w5opv")
+tonemap_mode = 1
+ssao_radius = 4.0
+ssao_intensity = 4.0
+ssil_intensity = 16.0
+glow_enabled = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_j6j0f"]
+size = Vector3(60, 8, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spn36"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_c15n5"]
+render_priority = 0
+shader = ExtResource("3_ukbo6")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/clamp_diffuse_to_max = false
+shader_parameter/cuts = 2
+shader_parameter/wrap = -0.0479999
+shader_parameter/steepness = 1.0
+shader_parameter/use_attenuation = true
+shader_parameter/use_specular = true
+shader_parameter/specular_strength = 0.05
+shader_parameter/specular_shininess = 8.0
+shader_parameter/use_rim = false
+shader_parameter/rim_width = 8.0
+shader_parameter/rim_color = Color(1, 1, 1, 1)
+shader_parameter/use_ramp = false
+shader_parameter/use_borders = false
+shader_parameter/border_width = 0.01
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_drhco"]
+render_priority = 0
+shader = ExtResource("3_ukbo6")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/clamp_diffuse_to_max = false
+shader_parameter/cuts = 1
+shader_parameter/wrap = -0.227
+shader_parameter/steepness = 1.0
+shader_parameter/use_attenuation = true
+shader_parameter/use_specular = false
+shader_parameter/specular_strength = 1.0
+shader_parameter/specular_shininess = 16.0
+shader_parameter/use_rim = false
+shader_parameter/rim_width = 8.0
+shader_parameter/rim_color = Color(1, 1, 1, 1)
+shader_parameter/use_ramp = false
+shader_parameter/use_borders = false
+shader_parameter/border_width = 0.225
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_c6ute")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ug0jw")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.318054, -0.843142, 0.433536, 0.722895, 0.0801893, 0.686289, -0.613404, 0.531678, 0.583999, 0, 4.43225, 0)
+shadow_enabled = true
+directional_shadow_mode = 1
+directional_shadow_max_distance = 50.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 3.59295, 7.206)
+projection = 1
+fov = 90.0
+size = 8.0
+far = 250.0
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 0)
+mesh = SubResource("BoxMesh_j6j0f")
+surface_material_override/0 = SubResource("StandardMaterial3D_spn36")
+
+[node name="head_test" parent="." instance=ExtResource("2_xsy3i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.94651, 0)
+
+[node name="Plane" parent="head_test" index="0"]
+surface_material_override/0 = SubResource("ShaderMaterial_c15n5")
+
+[node name="Plane_002" parent="head_test" index="1"]
+surface_material_override/0 = SubResource("ShaderMaterial_drhco")
+
+[editable path="head_test"]

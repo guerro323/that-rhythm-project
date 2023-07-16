@@ -25,6 +25,7 @@ public abstract partial class GameModeSystemBase : SimulationSystem
     
     protected GameModeSystemBase(Scope scope) : base(scope)
     {
+        SubscribeToUpdateLoop();
     }
 
     private ArchetypeQuery _query;
@@ -39,8 +40,6 @@ public abstract partial class GameModeSystemBase : SimulationSystem
 
         _query = new ArchetypeQuery(Simulation, all.Span, none.Span, or.Span);
         _cmd = new Commands(Simulation);
-        
-        SubscribeToUpdateLoop();
     }
 
     protected virtual void SubscribeToUpdateLoop()

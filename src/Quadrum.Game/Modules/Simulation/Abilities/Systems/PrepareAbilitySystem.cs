@@ -95,7 +95,7 @@ public partial class PrepareAbilitySystem : SimulationSystem
                     }
                 }
             }
-        }, _cmd);
+        }, _cmd, true);
     }
 
     private static void UpdateCombo(in GameComboState gameCombo, in GameCommandState commandState,

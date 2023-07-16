@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <ImplicitUsings>true</ImplicitUsings>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>../Generated</CompilerGeneratedFilesOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="revghost" Version="0.0.0-local" />
+        <PackageReference Include="revecs.Generator" Version="0.0.0-local" OutputItemType="Analyzer" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Quadrum.Game/Quadrum.Game.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Modules\" />
+    </ItemGroup>
+    
+</Project>

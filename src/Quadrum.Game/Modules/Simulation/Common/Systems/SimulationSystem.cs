@@ -88,8 +88,16 @@ public abstract class SimulationSystem : AppSystem
 
     public void Parallel<T>(ArchetypeQuery query, ArchetypeJob<T>.OnArchetype onArchetype, T arg)
     {
-        var job = new ArchetypeJob<T>(onArchetype, query);
+        /*var job = new ArchetypeJob<T>(onArchetype, query, true);
         job.PrepareData(arg);
-        Runner.QueueAndComplete(job);
+        Runner.QueueAndComplete(job);*/
+        foreach (var archetype in query.GetMatchedArchetypes())
+        {
+            onArchetype(Simulation.ArchetypeBoard.GetEntities(archetype), new SystemState<T>
+            {
+                Data = arg,
+                World = Simulation
+            });
+        }
     }
 }

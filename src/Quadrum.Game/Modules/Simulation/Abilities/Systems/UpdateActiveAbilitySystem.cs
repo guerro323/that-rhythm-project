@@ -43,7 +43,7 @@ public partial class UpdateActiveAbilitySystem : SimulationSystem
         {
             foreach (var entity in entities)
                 OnEntity(entity, state.Data);
-        }, _cmd);
+        }, _cmd, true);
 
         static void OnEntity(OwnerQuery.Iteration entity, Commands cmd)
         {

@@ -27,7 +27,7 @@ public class SimulationDomain : CommonDomainThreadListener
     public readonly RevolutionWorld GameWorld;
     public readonly IJobRunner JobRunner;
 
-    private readonly OpportunistJobRunner _jobRunner;
+    //private readonly OpportunistJobRunner _jobRunner;
 
     public readonly IManagedWorldTime WorldTime;
     private readonly ManagedWorldTime _worldTime;
@@ -65,7 +65,7 @@ public class SimulationDomain : CommonDomainThreadListener
             GameWorld = Scope.GameWorld;
             JobRunner = Scope.JobRunner;
 
-            _jobRunner = (OpportunistJobRunner) JobRunner;
+            //_jobRunner = (OpportunistJobRunner) JobRunner;
 
             Scope.Context.Register(WorldTime = _worldTime = new ManagedWorldTime());
             Scope.Context.Register(UpdateLoop = _updateLoop = new DefaultDomainUpdateLoopSubscriber(World));
@@ -87,7 +87,9 @@ public class SimulationDomain : CommonDomainThreadListener
 
     protected override void DomainUpdate()
     {
-        _jobRunner.CompleteBatch(_previousLoopJob, false);
+        //_jobRunner.CompleteBatch(_previousLoopJob, false);
+        
+        // GC.Collect();
 
         // future proof for a rollback system
         _worldTime.Total = _currentFrame * _worldTime.Delta;
@@ -99,14 +101,16 @@ public class SimulationDomain : CommonDomainThreadListener
                 Delta = _worldTime.Delta
             };
 
-            _jobRunner.StartPerformanceCriticalSection();
+            //_jobRunner.StartPerformanceCriticalSection();
             try
             {
+                Console.WriteLine("0.");
                 _updateLoop.Invoke(_worldTime.Total, _worldTime.Delta);
+                Console.WriteLine("1.");
             }
             finally
             {
-                _jobRunner.StopPerformanceCriticalSection();
+                //_jobRunner.StopPerformanceCriticalSection();
             }
         }
 
@@ -119,18 +123,21 @@ public class SimulationDomain : CommonDomainThreadListener
             Total = _worldTime.Total,
             Delta = _worldTime.Delta
         };
-        
-        _previousLoopJob = _jobRunner.Queue(new JobExecuteLoop(_simulationLoop, gameTime));
+
+        Console.WriteLine("2.");
+        _simulationLoop.Invoke(gameTime);
+        Console.WriteLine("3.");
+        /*_previousLoopJob = _jobRunner.Queue(new JobExecuteLoop(_simulationLoop, gameTime));
         if (DomainScope.Context.TryGet(out SchedulerDependencyResolver resolver))
         {
             var list = new ValueList<IDependencyCollection>(0);
             resolver.GetQueuedCollections(ref list);
             // If there is any dependency, complete the simulation job right now
-            if (list.Count > 0)
+            // if (list.Count > 0)
                 _jobRunner.CompleteBatch(_previousLoopJob, false);
-            
+
             list.Dispose();
-        }
+        }*/
     }
 
     private readonly record struct JobExecuteLoop(SimulationUpdateLoop Loop, GameTime GameTime) : IJob
@@ -144,14 +151,14 @@ public class SimulationDomain : CommonDomainThreadListener
         {
             //var sw = new Stopwatch();
             //sw.Start();
-            ((OpportunistJobRunner) runner).StartPerformanceCriticalSection();
+            //((OpportunistJobRunner) runner).StartPerformanceCriticalSection();
             try
             {
                 Loop.Invoke(GameTime);
             }
             finally
             {
-                ((OpportunistJobRunner) runner).StopPerformanceCriticalSection();
+                //((OpportunistJobRunner) runner).StopPerformanceCriticalSection();
             }
             //sw.Stop();
             // Console.WriteLine($"Frame={sw.Elapsed.TotalMilliseconds:F3}ms");
